@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Music Hub - 聚合搜索与解析</title>
+    <link rel="icon" href="/icon.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-sub: #718096;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-active: 0 10px 15px -3px rgba(102, 126, 234, 0.2);
+            --error-color: #e53e3e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #eef2f5;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-size: 100% 600px;
+            background-repeat: no-repeat;
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px 120px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 100%; max-width: 900px; z-index: 1; }
+
+        /* Search Box */
+        .search-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.5);
+            position: relative; 
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center; margin: 0 0 25px 0;
+            font-size: 2.2rem; font-weight: 800; letter-spacing: -1px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-group { display: flex; gap: 10px; margin-bottom: 25px; }
+        
+        input[type="text"] {
+            flex: 1; padding: 14px 24px;
+            border: 2px solid #e2e8f0; border-radius: 50px;
+            font-size: 16px; outline: none; transition: all 0.3s;
+            background: #f8fafc;
+            min-width: 0; /* WebKit flexbox fix */
+        }
+        input[type="text"]:focus {
+            border-color: var(--primary-color); background: #fff;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .search-btn {
+            padding: 0 32px; border: none; border-radius: 50px;
+            background: var(--primary-gradient); color: white;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            flex-shrink: 0;
+        }
+        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4); }
+
+        /* Error Message */
+        .error-msg {
+            background: #fff5f5; color: var(--error-color);
+            padding: 12px; border-radius: 8px; margin-bottom: 20px;
+            border: 1px solid #fed7d7; text-align: center; font-size: 14px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* Source Selector */
+        .source-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #edf2f7;
+        }
+        .source-title { font-weight: 700; color: var(--text-sub); font-size: 0.9rem; }
+        .ctrl-btn {
+            background: none; border: none; color: var(--text-sub);
+            font-size: 12px; cursor: pointer; padding: 4px 8px;
+            border-radius: 6px; transition: all 0.2s;
+        }
+        .ctrl-btn:hover { background: #edf2f7; color: var(--primary-color); }
+
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .source-checkbox { display: none; }
+        .source-card {
+            background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 8px;
+            cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+        .source-name { font-size: 14px; font-weight: 700; color: #4a5568; margin-bottom: 3px; }
+        .source-desc { font-size: 11px; color: #a0aec0; line-height: 1.2; font-weight: 400; }
+        .source-checkbox:checked + .source-card {
+            border-color: var(--primary-color); background: #eff3ff;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.15);
+        }
+        .source-checkbox:checked + .source-card .source-name { color: var(--primary-color); }
+        .source-checkbox:checked + .source-card .source-desc { color: #7f9cf5; }
+
+        /* Results */
+        .result-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 15px; }
+        .song-card {
+            background: #fff; padding: 15px; border-radius: 16px;
+            box-shadow: var(--shadow); display: flex; align-items: center;
+            transition: all 0.2s ease; position: relative; z-index: 5;
+        }
+        .song-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-active); }
+        .cover-wrapper {
+            width: 64px; height: 64px; border-radius: 10px; overflow: hidden;
+            flex-shrink: 0; margin-right: 15px; background: #eee;
+        }
+        .cover-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .song-info { flex: 1; min-width: 0; margin-right: 10px; }
+        .song-info h3 { margin: 0 0 6px; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .artist-line { font-size: 13px; color: var(--text-sub); margin-bottom: 8px; }
+        .tags { display: flex; gap: 6px; }
+        .tag { font-size: 10px; padding: 3px 8px; border-radius: 6px; background: #edf2f7; color: #718096; font-weight: 600; }
+        .tag-src { background: #ebf8ff; color: #3182ce; text-transform: uppercase; }
+        
+        .tag-loading { color: #d69e2e; } 
+        .tag-success { color: #38a169; }
+        .tag-fail { color: #e53e3e; }
+
+        .actions { display: flex; gap: 8px; }
+        .btn-circle {
+            width: 36px; height: 36px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
+            position: relative; z-index: 10; font-size: 14px;
+        }
+        .btn-play { background: var(--primary-gradient); color: white; box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); }
+        .btn-play:hover { transform: scale(1.1); }
+        .btn-dl { background: #f7fafc; color: var(--text-sub); border: 1px solid #e2e8f0; }
+        .btn-dl:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+        .no-results { text-align: center; padding: 60px; color: var(--text-sub); }
+
+        /* Cookie Modal */
+        .settings-float {
+            position: absolute; top: 30px; right: 30px;
+            background: white; border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: var(--text-sub); transition: 0.2s; z-index: 20;
+        }
+        .settings-float:hover { color: var(--primary-color); transform: rotate(90deg); }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; display: none;
+            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal {
+            background: white; padding: 25px; border-radius: 20px;
+            width: 90%; max-width: 450px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .cookie-list { max-height: 400px; overflow-y: auto; margin: 15px 0; }
+        .cookie-item { margin-bottom: 10px; }
+        .cookie-item label { display: block; font-size: 12px; color: #718096; margin-bottom: 4px; font-weight: 600; }
+        .cookie-item input {
+            width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: 12px; box-sizing: border-box;
+        }
+        .btn-save {
+            width: 100%; padding: 10px; background: var(--primary-gradient);
+            color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;
+        }
+
+        /* APlayer Fix */
+        .aplayer.aplayer-fixed .aplayer-lrc {
+            margin-bottom: 20px; 
+            padding-bottom: 20px; 
+            text-shadow: none !important;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
+            pointer-events: none !important;
+        }
+        .aplayer .aplayer-lrc p {
+            font-size: 16px !important; line-height: 32px !important;
+            color: #000 !important; opacity: 0.1 !important; filter: blur(1px);
+            transform: scale(0.95); transition: all 0.5s !important;
+            margin: 0 !important; font-family: "PingFang SC", sans-serif !important;
+        }
+        .aplayer .aplayer-lrc p.aplayer-lrc-current ~ p { opacity: 0.5 !important; filter: blur(0px); }
+        .aplayer .aplayer-lrc p.aplayer-lrc-current {
+            font-size: 24px !important; opacity: 1 !important; filter: blur(0px);
+            font-weight: 800 !important; margin: 15px 0 !important; transform: scale(1.05);
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        #waifu { left: 20px !important; bottom: 90px !important; z-index: 99999 !important; pointer-events: none !important; }
+        #waifu canvas, #waifu-tool, #waifu-tips { pointer-events: auto !important; }
+
+        /* =========================================
+           MOBILE ADAPTATION
+           ========================================= */
+        @media (max-width: 768px) {
+            #waifu { display: none; }
+            body { padding: 0 0 100px 0; background-size: 100% 400px; }
+            .container { padding: 0; width: 100%; }
+
+            /* Search Box Compact */
+            .search-box { 
+                padding: 20px 15px; 
+                border-radius: 0 0 20px 20px; 
+                margin-bottom: 20px;
+                border-left: none; border-right: none; border-top: none;
+            }
+            h1 { font-size: 1.8rem; margin-bottom: 20px; }
+            .input-group { margin-bottom: 15px; }
+
+            /* Grid & Card */
+            .source-grid { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 8px; }
+            .source-card { padding: 8px 4px; min-height: 40px; justify-content: center; }
+            .source-name { font-size: 12px; }
+            .source-desc { display: none; }
+
+            .result-list { padding: 0 12px; gap: 12px; }
+            .song-card { margin: 0; padding: 12px; border-radius: 12px; }
+            .cover-wrapper { width: 54px; height: 54px; margin-right: 12px; border-radius: 8px; }
+            .song-info h3 { font-size: 15px; margin-bottom: 4px; max-width: 100%; }
+            .artist-line { font-size: 12px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+            .tags { flex-wrap: wrap; }
+            .tag { padding: 2px 5px; }
+            .actions { gap: 8px; flex-shrink: 0; }
+            .btn-circle { width: 34px; height: 34px; font-size: 13px; }
+            .settings-float { top: 15px; right: 15px; width: 36px; height: 36px; }
+            .modal { width: 85%; max-height: 80vh; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="settings-float" onclick="openCookieModal()" title="Cookie 设置">
+    <i class="fa-solid fa-gear"></i>
+</div>
+
+<div class="container">
+    <div class="search-box">
+        <h1>🎵 Music Hub</h1>
+        <form action="/search" method="get">
+            <div class="input-group">
+                <input type="text" name="q" value="{{.Keyword}}" placeholder="搜索歌曲、歌手... 或直接粘贴分享链接" required autocomplete="off">
+                <button type="submit" class="search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+
+            {{ if .Error }}
+            <div class="error-msg">
+                <i class="fa-solid fa-circle-exclamation"></i> {{ .Error }}
+            </div>
+            {{ end }}
+
+            <div class="source-selector">
+                <div class="source-header">
+                    <span class="source-title">搜索源设置</span>
+                    <div>
+                        <button type="button" class="ctrl-btn" id="btn-all">全选</button>
+                        <button type="button" class="ctrl-btn" id="btn-none">清空</button>
+                    </div>
+                </div>
+                
+                <div class="source-grid">
+                    {{ range $source := .AllSources }}
+                    <label>
+                        <input type="checkbox" name="sources" value="{{ $source }}" class="source-checkbox"
+                            {{ if $.Selected }}
+                                {{ range $.Selected }}{{ if eq . $source }}checked{{ end }}{{ end }}
+                            {{ else }}
+                                {{ range $.DefaultSources }}{{ if eq . $source }}checked{{ end }}{{ end }}
+                            {{ end }}> 
+                        <div class="source-card">
+                            <div class="source-name">{{ $source }}</div>
+                            <div class="source-desc">{{ index $.SourceDescriptions $source }}</div>
+                        </div>
+                    </label>
+                    {{ end }}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{ if .Result }}
+        <ul class="result-list">
+            {{ range .Result }}
+            <li class="song-card" 
+                data-id="{{.ID}}" 
+                data-source="{{.Source}}" 
+                data-duration="{{.Duration}}" 
+                data-name="{{.Name}}" 
+                data-artist="{{.Artist}}">
+                
+                <div class="cover-wrapper">
+                    {{ if .Cover }}
+                        <img src="{{ .Cover }}" alt="{{ .Name }}" loading="lazy" onerror="this.src='https://via.placeholder.com/150?text=Music'" >
+                    {{ else }}
+                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:24px;">🎵</div>
+                    {{ end }}
+                </div>
+                <div class="song-info">
+                    <h3>{{ .Name }}</h3>
+                    <div class="artist-line">
+                        <i class="fa-regular fa-user" style="font-size:11px;"></i> {{ .Artist }}
+                        {{ if .Album }} &nbsp;•&nbsp; {{ .Album }}{{ end }}
+                    </div>
+                    <div class="tags">
+                        <span class="tag tag-src">{{ .Source }}</span>
+                        {{ if .FormatDuration }}<span class="tag">{{ .FormatDuration }}</span>{{ end }}
+                        <span class="tag tag-loading" id="size-{{.ID}}"><i class="fa fa-spinner fa-spin"></i></span>
+                        <span class="tag tag-loading" id="bitrate-{{.ID}}"><i class="fa fa-circle-notch fa-spin"></i></span>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="button" class="btn-circle btn-play" title="播放"
+                            onclick="playMusic('{{.ID}}', '{{.Source}}', '{{.Name}}', '{{.Artist}}', '{{.Cover}}')">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    
+                    <a href="/download?id={{.ID}}&source={{.Source}}&name={{.Name}}&artist={{.Artist}}" 
+                       id="dl-{{.ID}}" class="btn-circle btn-dl" title="下载歌曲" target="_blank">
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+
+                    <a href="/download_lrc?id={{.ID}}&source={{.Source}}&name={{.Name}}&artist={{.Artist}}" 
+                       id="lrc-{{.ID}}" class="btn-circle btn-dl" title="下载歌词" target="_blank">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </a>
+
+                    {{ if .Cover }}
+                    <a href="/download_cover?url={{ .Cover }}&name={{ .Name }}&artist={{ .Artist }}" 
+                       class="btn-circle btn-dl" title="下载封面" target="_blank">
+                        <i class="fa-regular fa-image"></i>
+                    </a>
+                    {{ end }}
+                </div>
+            </li>
+            {{ end }}
+        </ul>
+    {{ else if .Keyword }}
+        {{ if not .Error }}
+        <div class="no-results">
+            <i class="fa-solid fa-music" style="font-size: 40px; margin-bottom: 10px; display:block;"></i>
+            <p>未找到符合条件的资源</p>
+        </div>
+        {{ end }}
+    {{ end }}
+</div>
+
+<div id="cookieModal" class="modal-overlay">
+    <div class="modal">
+        <h3 style="margin-top:0; text-align:center;">设置 Cookies</h3>
+        <div class="cookie-list">
+            {{ range $source := .AllSources }}
+            <div class="cookie-item">
+                <label>{{ $source }}</label>
+                <input type="text" id="cookie-{{$source}}" placeholder="在此粘贴 Cookie...">
+            </div>
+            {{ end }}
+        </div>
+        <button class="btn-save" onclick="saveCookies()">保存设置</button>
+        <div style="text-align:center; margin-top:10px; font-size:12px; color:#718096; cursor:pointer;" onclick="document.getElementById('cookieModal').style.display='none'">关闭</div>
+    </div>
+</div>
+
+<div id="aplayer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script>
+<script src="https://fastly.jsdelivr.net/gh/stevenjoezhang/live2d-widget@latest/autoload.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.source-checkbox');
+        document.getElementById('btn-all').onclick = () => checkboxes.forEach(cb => cb.checked = true);
+        document.getElementById('btn-none').onclick = () => checkboxes.forEach(cb => cb.checked = false);
+
+        // 自动检测 (仅用于显示音质标签，不影响按钮状态)
+        const cards = document.querySelectorAll('.song-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => inspectSong(card), index * 100);
+        });
+    });
+
+    function inspectSong(card) {
+        const id = card.dataset.id;
+        const source = card.dataset.source;
+        const duration = card.dataset.duration;
+
+        fetch(`/inspect?id=${encodeURIComponent(id)}&source=${source}&duration=${duration}`)
+            .then(r => r.json())
+            .then(data => {
+                const sizeTag = document.getElementById(`size-${id}`);
+                const bitrateTag = document.getElementById(`bitrate-${id}`);
+
+                if (data.valid) {
+                    sizeTag.textContent = data.size;
+                    sizeTag.className = "tag";
+                    bitrateTag.textContent = data.bitrate;
+                    bitrateTag.className = "tag";
+                } else {
+                    sizeTag.textContent = "无效";
+                    sizeTag.className = "tag tag-fail";
+                    bitrateTag.textContent = "-";
+                    bitrateTag.className = "tag";
+                }
+            })
+            .catch(() => {
+                document.getElementById(`size-${id}`).textContent = "检测失败";
+            });
+    }
+
+    // Cookie Logic
+    function openCookieModal() {
+        document.getElementById('cookieModal').style.display = 'flex';
+        fetch('/cookies').then(r => r.json()).then(data => {
+            for (const [k, v] of Object.entries(data)) {
+                const el = document.getElementById(`cookie-${k}`);
+                if(el) el.value = v;
+            }
+        });
+    }
+
+    function saveCookies() {
+        const data = {};
+        document.querySelectorAll('input[id^="cookie-"]').forEach(input => {
+            if (input.value) data[input.id.replace('cookie-', '')] = input.value;
+        });
+        fetch('/cookies', {
+            method: 'POST', 
+            body: JSON.stringify(data)
+        }).then(() => {
+            alert('保存成功！');
+            document.getElementById('cookieModal').style.display = 'none';
+        });
+    }
+
+    const ap = new APlayer({
+        container: document.getElementById('aplayer'),
+        fixed: true, autoplay: true, theme: '#667eea',
+        loop: 'all', order: 'list', preload: 'auto', volume: 0.7, listFolded: false, lrcType: 3, audio: []
+    });
+
+    function playMusic(id, source, name, artist, cover) {
+        ap.list.clear();
+        ap.list.add({
+            name: name, artist: artist,
+            url: `/download?id=${encodeURIComponent(id)}&source=${source}&name=${encodeURIComponent(name)}&artist=${encodeURIComponent(artist)}`,
+            cover: cover || 'https://via.placeholder.com/150?text=Music',
+            lrc: `/lyric?id=${encodeURIComponent(id)}&source=${source}`,
+            theme: '#667eea'
+        });
+        ap.play();
+    }
+</script>
+
+</body>
+</html>

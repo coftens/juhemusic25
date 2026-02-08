@@ -1,0 +1,6 @@
+{
+    "version": "7.06",
+    "download_url": "https://your-server.com/download/app-v7.06.apk",
+    "force": false,
+    "changelog": "- 新增版本检查功能\n- 修复收藏按钮问题\n- 优化性能体验"
+}

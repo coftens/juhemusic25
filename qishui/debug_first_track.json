@@ -1,0 +1,418 @@
+{
+  "id": "7424419866700826625",
+  "type": "track",
+  "entity": {
+    "track_wrapper": {
+      "track": {
+        "id": "7424419866700826625",
+        "album": {
+          "id": "7424419850833823761",
+          "name": "我是真的爱上你",
+          "release_date": 1728604800,
+          "url_cover": {
+            "uri": "tos-cn-v-2774c002/oQ2WEqQZAtsNxADwBAgF1CpJEf1InbEBeAa0IC",
+            "urls": [
+              "https://p3-luna.douyinpic.com/img/",
+              "https://p6-luna.douyinpic.com/img/"
+            ],
+            "template_prefix": "tplv-b829550vbb"
+          },
+          "url_player_bg": {
+            "uri": "tos-cn-v-2774c002/oQ2WEqQZAtsNxADwBAgF1CpJEf1InbEBeAa0IC",
+            "urls": [
+              "https://p3-luna.douyinpic.com/img/",
+              "https://p6-luna.douyinpic.com/img/"
+            ],
+            "template": "background:${width}:${height}:30:90:0",
+            "template_prefix": "tplv-b829550vbb"
+          },
+          "cover_gradient_effect_color": [
+            {
+              "rgb": "957152"
+            },
+            {
+              "rgb": "664b34"
+            }
+          ],
+          "recommend_reason_background_color": {
+            "rgb": "56402d",
+            "alpha": "8c"
+          },
+          "featured_comment_tag_color": {
+            "rgb": "cca37f"
+          },
+          "background_color": "664b34",
+          "playing_wave_color": {
+            "rgb": "a57f5f"
+          },
+          "paused_wave_color": {
+            "rgb": "7b6e63",
+            "alpha": "bf"
+          }
+        },
+        "artists": [
+          {
+            "id": "6799531414552315906",
+            "name": "en",
+            "url_avatar": {
+              "uri": "tos-cn-v-2774c002/oMQOIiQZAtpAzAD0BAgFiGUeIfHAolEBVA6twC",
+              "urls": [
+                "https://p3-luna.douyinpic.com/img/",
+                "https://p6-luna.douyinpic.com/img/"
+              ],
+              "template_prefix": "tplv-b829550vbb"
+            },
+            "state": {
+              "blocked_by_me": false
+            },
+            "user_info": {
+              "id": "55923270292",
+              "nickname": "en王翊恩",
+              "medium_avatar_url": {
+                "urls": [
+                  "https://p26.douyinpic.com/aweme/720x720/aweme-avatar/mosaic-legacy_1ca1f0004abd54464e4ce.jpeg?from=3782654143",
+                  "https://p3.douyinpic.com/aweme/720x720/aweme-avatar/mosaic-legacy_1ca1f0004abd54464e4ce.jpeg?from=3782654143",
+                  "https://p11.douyinpic.com/aweme/720x720/aweme-avatar/mosaic-legacy_1ca1f0004abd54464e4ce.jpeg?from=3782654143"
+                ],
+                "need_complete_url": true
+              },
+              "thumb_avatar_url": {
+                "urls": [
+                  "https://p11.douyinpic.com/aweme/100x100/aweme-avatar/mosaic-legacy_1ca1f0004abd54464e4ce.jpeg?from=3782654143",
+                  "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/mosaic-legacy_1ca1f0004abd54464e4ce.jpeg?from=3782654143",
+                  "https://p26.douyinpic.com/aweme/100x100/aweme-avatar/mosaic-legacy_1ca1f0004abd54464e4ce.jpeg?from=3782654143"
+                ],
+                "need_complete_url": true
+              },
+              "artist_id": "6799531414552315906",
+              "secret": false,
+              "test_tag": 0,
+              "vip_stage": "",
+              "is_vip": false,
+              "is_luna_user": true
+            },
+            "simple_display_name": "en",
+            "user_artist_type": 2
+          }
+        ],
+        "duration": 203862,
+        "name": "我是真的爱上你",
+        "preview": {
+          "duration": 30047,
+          "vid": "v10ad6g50000cs4dhhvog65j3ulc82h0",
+          "bit_rates": [
+            {
+              "br": 260774,
+              "size": 977903,
+              "quality": "highest"
+            },
+            {
+              "br": 68717,
+              "size": 257692,
+              "quality": "medium"
+            },
+            {
+              "br": 132710,
+              "size": 497663,
+              "quality": "higher"
+            }
+          ]
+        },
+        "state": {},
+        "stats": {
+          "count_collected": 1849487,
+          "count_comment": 14474,
+          "count_shared": 85324
+        },
+        "vid": "v10ad6g50000cs4dd67og65u62krbu4g",
+        "label_info": {
+          "only_vip_download": true,
+          "only_vip_playable": true,
+          "quality_only_vip_can_download": [
+            "medium",
+            "higher",
+            "highest",
+            "lossless"
+          ],
+          "quality_only_vip_can_play": [
+            "lossless"
+          ],
+          "quality_map": {
+            "spatial": {
+              "play_detail": {
+                "condition": "benefit_play_spatial",
+                "need_vip": true,
+                "need_purchase": false
+              },
+              "download_detail": {
+                "condition": "benefit_download_spatial",
+                "need_vip": true,
+                "need_purchase": false
+              }
+            },
+            "hi_res": {
+              "play_detail": {
+                "condition": "benefit_play_hi_res",
+                "need_vip": true,
+                "need_purchase": false
+              },
+              "download_detail": null
+            },
+            "medium": {
+              "play_detail": {
+                "condition": "benefit_play_medium",
+                "need_vip": false,
+                "need_purchase": false
+              },
+              "download_detail": {
+                "condition": "benefit_download_medium",
+                "need_vip": true,
+                "need_purchase": false
+              }
+            },
+            "higher": {
+              "play_detail": {
+                "condition": "benefit_play_higher",
+                "need_vip": false,
+                "need_purchase": false
+              },
+              "download_detail": {
+                "condition": "benefit_download_higher",
+                "need_vip": true,
+                "need_purchase": false
+              }
+            },
+            "highest": {
+              "play_detail": {
+                "condition": "benefit_play_highest",
+                "need_vip": false,
+                "need_purchase": false
+              },
+              "download_detail": {
+                "condition": "benefit_download_highest",
+                "need_vip": true,
+                "need_purchase": false
+              }
+            },
+            "lossless": {
+              "play_detail": {
+                "condition": "benefit_play_lossless",
+                "need_vip": true,
+                "need_purchase": false
+              },
+              "download_detail": {
+                "condition": "benefit_download_lossless",
+                "need_vip": true,
+                "need_purchase": false
+              }
+            }
+          }
+        },
+        "sim_id": 6814560351879694337,
+        "bit_rates": [
+          {
+            "br": 66150,
+            "size": 1685702,
+            "quality": "medium"
+          },
+          {
+            "br": 132206,
+            "size": 3368986,
+            "quality": "higher"
+          },
+          {
+            "br": 260242,
+            "size": 6631692,
+            "quality": "highest"
+          },
+          {
+            "br": 914709,
+            "size": 23309321,
+            "quality": "lossless"
+          },
+          {
+            "br": 324245,
+            "size": 8263037,
+            "quality": "spatial"
+          }
+        ],
+        "audition_info": {
+          "vid": "v10ad6g50000cs4dhhvog65j3ulc82h0",
+          "duration_ms": 30047
+        },
+        "recommend_content_source": "featured_comment",
+        "song_maker_team": {
+          "composers": [
+            {
+              "name": "汤小康"
+            }
+          ],
+          "lyricists": [
+            {
+              "name": "汤小康/刘杰胜"
+            }
+          ]
+        },
+        "media_type": "track",
+        "chorus": {
+          "duration": 0,
+          "start": 48576
+        },
+        "colors": {
+          "cover_gradient_effect_color": [
+            {
+              "rgb": "957152"
+            },
+            {
+              "rgb": "664b34"
+            }
+          ],
+          "normal_lyric_color": {
+            "rgb": "d4b091"
+          },
+          "playing_lyric_color": {
+            "rgb": "fff1e5"
+          },
+          "recommend_reason_background_color": {
+            "rgb": "56402d",
+            "alpha": "8c"
+          },
+          "featured_comment_tag_color": {
+            "rgb": "cca37f"
+          },
+          "background_color": {
+            "rgb": "664b34"
+          },
+          "playing_wave_color": {
+            "rgb": "a57f5f"
+          },
+          "paused_wave_color": {
+            "rgb": "7b6e63",
+            "alpha": "bf"
+          },
+          "comment_share_additional_color": {
+            "rgb": "664b34"
+          },
+          "base_colors": [
+            {
+              "rgb": "fdf1e7"
+            },
+            {
+              "rgb": "ebd0bb"
+            },
+            {
+              "rgb": "d1b095"
+            },
+            {
+              "rgb": "b59071"
+            },
+            {
+              "rgb": "957152"
+            },
+            {
+              "rgb": "7a5a40"
+            },
+            {
+              "rgb": "5e442f"
+            },
+            {
+              "rgb": "422e1e"
+            },
+            {
+              "rgb": "24190f"
+            }
+          ],
+          "non_interactive_anchor_background": {
+            "rgb": "795c43",
+            "alpha": "8c"
+          }
+        },
+        "limited_free_info": null,
+        "vocal": 1,
+        "lang_codes": [
+          "ZH"
+        ],
+        "first_vocal": {
+          "duration": 28992,
+          "start": 19584
+        },
+        "sharable_platforms": [
+          "link",
+          "aweme",
+          "aweme_publish",
+          "wechat_zone",
+          "wechat",
+          "weibo",
+          "qq_zone",
+          "qq"
+        ],
+        "playable_range": {
+          "duration": 29183,
+          "start": 98880
+        },
+        "plug_status": {
+          "can_plug": false,
+          "is_plugged": false
+        },
+        "tags": [
+          {
+            "category": {
+              "tag_id": 1,
+              "tag_name": "Genre"
+            },
+            "first_level_tag": {
+              "tag_id": 6730932201380170498,
+              "tag_name": "Pop"
+            }
+          },
+          {
+            "category": {
+              "tag_id": 1,
+              "tag_name": "Genre"
+            },
+            "first_level_tag": {
+              "tag_id": 6730932201380170498,
+              "tag_name": "Pop"
+            },
+            "second_level_tag": {
+              "tag_id": 6826166022211373057,
+              "tag_name": "Chinese Pop"
+            }
+          }
+        ],
+        "nodes": [
+          {
+            "type": 1,
+            "start": 19584,
+            "duration": 28992,
+            "opacity": 0.5
+          },
+          {
+            "type": 2,
+            "start": 48576,
+            "duration": 0,
+            "opacity": 1
+          }
+        ],
+        "is_support_bell": true
+      },
+      "limited_free_info": {
+        "queue_types": null,
+        "limited_free": false,
+        "expire_time": 1770055808,
+        "sign": "152da9972b91a54773fa1ec451ed39da",
+        "sign_version": "2.0",
+        "limited_free_type": "",
+        "config": {
+          "rewind_previous_preview_popup": {
+            "intercept_type": "vip"
+          }
+        },
+        "rewind_prev_intercept_type": "only_sell",
+        "intercept_type": ""
+      }
+    }
+  },
+  "card_context": {},
+  "predict_info": {}
+}
