@@ -1,0 +1,89 @@
+workflows:
+  ios-release:
+    name: iOS Release Workflow
+    max_build_duration: 120
+    instance_type: mac_pro
+    
+    environment:
+      ios_signing:
+        provisioning_profiles:
+          - name: ios_release_app_store
+      xcode: latest
+      cocoapods: default
+      vars:
+        BUNDLE_ID: "com.example.flutter_app"
+        
+    triggering:
+      events:
+        - push
+        - tag
+      branch:
+        - master
+        - main
+
+    scripts:
+      - name: Install Cocoapods
+        script: sudo gem install cocoapods
+
+      - name: Install Flutter dependencies
+        script: flutter pub get
+
+      - name: Build iOS App
+        script: flutter build ios --release --no-codesign
+
+      - name: Build and sign IPA
+        script: |
+          cd ios
+          pod install
+          xcodebuild build-archive -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath $HOME/Library/Developer/Xcode/Archives/Runner.xcarchive -allowProvisioningUpdates
+          
+          xcodebuild -exportArchive -archivePath $HOME/Library/Developer/Xcode/Archives/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $HOME/export -allowProvisioningUpdates
+
+    artifacts:
+      - $HOME/export/*.ipa
+      - $HOME/Library/Developer/Xcode/Archives/Runner.xcarchive
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_for_review: false
+        release_type: MANUAL
+
+  android-release:
+    name: Android Release Workflow
+    max_build_duration: 120
+    instance_type: linux_x2
+    
+    environment:
+      android_signing:
+        - keystore_reference
+      java: java11
+      ndk: r21e
+
+    triggering:
+      events:
+        - push
+        - tag
+      branch:
+        - master
+        - main
+
+    scripts:
+      - name: Install Flutter dependencies
+        script: flutter pub get
+
+      - name: Build Android APK
+        script: flutter build apk --release
+
+      - name: Build Android App Bundle
+        script: flutter build appbundle --release
+
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
+
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_for_review: false
