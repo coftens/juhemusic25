@@ -12,22 +12,21 @@ workflows:
     scripts:
       - name: Get Flutter dependencies
         script: |
-          echo "Current working directory: $(pwd)"
-          echo "Contents of current directory:"
-          ls -la
+          echo "===== Current working directory: $(pwd)"
+          echo "===== Listing root contents:"
+          ls -la | head -20
           
           # 检查 flutter_app 是否存在
           if [ ! -d "flutter_app" ]; then
             echo "❌ flutter_app directory not found!"
-            echo "Looking for pubspec.yaml..."
-            find . -name "pubspec.yaml" -type f
+            find . -name "pubspec.yaml" -type f 2>/dev/null | head -5
             exit 1
           fi
           
           cd flutter_app
-          echo "Changed to: $(pwd)"
-          echo "Contents:"
-          ls -la
+          echo "===== Changed to: $(pwd)"
+          echo "===== Contents of flutter_app:"
+          ls -la | head -20
           
           # 检查 pubspec.yaml
           if [ ! -f "pubspec.yaml" ]; then
@@ -35,7 +34,19 @@ workflows:
             exit 1
           fi
           
-          flutter pub get
+          echo "===== Running: flutter pub get"
+          flutter pub get || { echo "❌ flutter pub get failed!"; exit 1; }
+          
+          echo "===== Verifying .dart_tool:"
+          if [ ! -d ".dart_tool" ]; then
+            echo "❌ .dart_tool not created after flutter pub get!"
+            exit 1
+          fi
+          
+          echo "===== Contents of packages directory:"
+          ls -la .dart_tool/pub/hosted/ 2>/dev/null | head -10
+          
+          echo "✅ Dependencies resolved successfully"
       - name: Build and Package IPA
         script: |
           cd flutter_app
