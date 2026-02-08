@@ -12,7 +12,29 @@ workflows:
     scripts:
       - name: Get Flutter dependencies
         script: |
+          echo "Current working directory: $(pwd)"
+          echo "Contents of current directory:"
+          ls -la
+          
+          # 检查 flutter_app 是否存在
+          if [ ! -d "flutter_app" ]; then
+            echo "❌ flutter_app directory not found!"
+            echo "Looking for pubspec.yaml..."
+            find . -name "pubspec.yaml" -type f
+            exit 1
+          fi
+          
           cd flutter_app
+          echo "Changed to: $(pwd)"
+          echo "Contents:"
+          ls -la
+          
+          # 检查 pubspec.yaml
+          if [ ! -f "pubspec.yaml" ]; then
+            echo "❌ pubspec.yaml not found in flutter_app!"
+            exit 1
+          fi
+          
           flutter pub get
       - name: Build and Package IPA
         script: |
