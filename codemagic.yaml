@@ -1,89 +1,58 @@
 workflows:
-  ios-release:
-    name: iOS Release Workflow
-    max_build_duration: 120
-    instance_type: mac_pro
-    
+  ios-release-workflow:
+    name: iOS IPA Build (No Codesign)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
     environment:
-      ios_signing:
-        provisioning_profiles:
-          - name: ios_release_app_store
-      xcode: latest
-      cocoapods: default
       vars:
-        BUNDLE_ID: "com.example.flutter_app"
-        
-    triggering:
-      events:
-        - push
-        - tag
-      branch:
-        - master
-        - main
-
+        # 你可以在此处添加 SHOREBIRD_TOKEN，或者保持在 Codemagic UI 中设置
+        SHOREBIRD_TOKEN: eyJyZWZyZXNoX3Rva2VuIjoiMS8vMDY1SEZ2XzBTa3h6T0NnWUlBUkFBR0FZU053Ri1MOUlyVmM2aXF2TjFNTmhyVHhTRi1LVlByZkhnTzR6TFVfblVqQlFpaVpTNkdRU2VYcEpxbC1nZDdsTVpWTGk3S19qb3pMZyIsImF1dGhfcHJvdmlkZXIiOiJnb29nbGUifQ==
+      flutter: stable
+      xcode: latest
     scripts:
-      - name: Install Cocoapods
-        script: sudo gem install cocoapods
-
-      - name: Install Flutter dependencies
+      - name: Get Flutter dependencies
         script: flutter pub get
-
-      - name: Build iOS App
-        script: flutter build ios --release --no-codesign
-
-      - name: Build and sign IPA
+      - name: Build and Package IPA
         script: |
-          cd ios
-          pod install
-          xcodebuild build-archive -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath $HOME/Library/Developer/Xcode/Archives/Runner.xcarchive -allowProvisioningUpdates
+          # 1. 准备 Flutter 构建产物 (但不进行完整构建)
+          flutter build ios --config-only --release --no-codesign
           
-          xcodebuild -exportArchive -archivePath $HOME/Library/Developer/Xcode/Archives/Runner.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $HOME/export -allowProvisioningUpdates
-
+          # 2. 使用 xcodebuild 直接构建 (强制覆盖签名设置)
+          xcodebuild -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_STYLE=Manual \
+            -derivedDataPath build/ios_build \
+            -destination generic/platform=iOS \
+            clean build || { echo "❌ xcodebuild Failed"; exit 1; }
+          
+          # 3. 创建 Payload
+          mkdir -p build/ios/ipa/Payload
+          
+          # 4. 查找 .app 文件 (现在位于自定义的 derivedDataPath 中)
+          echo "Looking for .app file in build/ios_build..."
+          APP_PATH=$(find build/ios_build -name "*.app" -type d | head -n 1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "❌ Error: .app file not found!"
+            echo "Listing build directory:"
+            ls -R build/ios
+            exit 1
+          fi
+          
+          echo "✅ Found app at: $APP_PATH"
+          cp -r "$APP_PATH" build/ios/ipa/Payload/
+          
+          # 4. 压缩
+          cd build/ios/ipa
+          zip -r juhemusic.ipa Payload
     artifacts:
-      - $HOME/export/*.ipa
-      - $HOME/Library/Developer/Xcode/Archives/Runner.xcarchive
-
+      - build/ios/ipa/*.ipa
     publishing:
-      app_store_connect:
-        auth: integration
-        submit_for_review: false
-        release_type: MANUAL
-
-  android-release:
-    name: Android Release Workflow
-    max_build_duration: 120
-    instance_type: linux_x2
-    
-    environment:
-      android_signing:
-        - keystore_reference
-      java: java11
-      ndk: r21e
-
-    triggering:
-      events:
-        - push
-        - tag
-      branch:
-        - master
-        - main
-
-    scripts:
-      - name: Install Flutter dependencies
-        script: flutter pub get
-
-      - name: Build Android APK
-        script: flutter build apk --release
-
-      - name: Build Android App Bundle
-        script: flutter build appbundle --release
-
-    artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk
-      - build/app/outputs/bundle/release/app-release.aab
-
-    publishing:
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-        submit_for_review: false
+      email:
+        recipients:
+          - zhaozheng982@gmail.com
