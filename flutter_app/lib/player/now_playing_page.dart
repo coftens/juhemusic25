@@ -206,9 +206,7 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
             }
           },
           onOpenQueue: () => _openQueue(context),
-          onOpenArLyrics: Platform.isIOS
-              ? () => ArLyricsPage.push(context, item: it)
-              : null,
+          onOpenArLyrics: () => ArLyricsPage.push(context, item: it),
           onSeek: (d) {
             if (TogetherService().isConnected && !TogetherService().isHost) {
               ScaffoldMessenger.of(context).showSnackBar(
