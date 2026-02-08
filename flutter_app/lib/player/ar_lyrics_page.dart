@@ -28,6 +28,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   final _svc = PlayerService.instance;
 
   ARKitController? _arkit;
+  vec.Matrix4? _lastCameraTransform;
 
   static const _fadeStep = Duration(milliseconds: 70);
   static const _fadeInSteps = [0.2, 0.45, 0.7, 0.95];
@@ -139,6 +140,13 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   void _onARKitViewCreated(ARKitController controller) {
     _arkit = controller;
+    
+    // Initialize camera transform
+    _lastCameraTransform = vec.Matrix4.identity();
+    
+    // Listen to AR frame updates for camera tracking
+    controller.onNodeTap = (_) {}; // Enable scene updates
+    
     _refreshNodes();
   }
 
@@ -199,7 +207,6 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       geometry: geometry,
       position: position,
       scale: vec.Vector3.all(0.01),
-      constraints: [ARKitBillboardConstraint()],
     );
 
     _arkit?.add(node);
@@ -241,7 +248,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   }
 
   vec.Vector3 _positionInFrontOfCamera(double distance) {
-    final camera = _arkit?.cameraTransform;
+    final camera = _lastCameraTransform;
     if (camera == null) {
       return vec.Vector3(0, 0, -distance);
     }
@@ -257,7 +264,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   }
 
   vec.Vector3? _cameraPosition() {
-    final camera = _arkit?.cameraTransform;
+    final camera = _lastCameraTransform;
     if (camera == null) return null;
     return camera.getTranslation();
   }
@@ -315,9 +322,6 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
         children: [
           ARKitSceneView(
             onARKitViewCreated: _onARKitViewCreated,
-            configuration: ARKitWorldTrackingConfiguration(
-              planeDetection: ARPlaneDetection.horizontal,
-            ),
           ),
           SafeArea(
             child: Padding(
