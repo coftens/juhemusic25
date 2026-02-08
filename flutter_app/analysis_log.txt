@@ -1,0 +1,278 @@
+Analyzing flutter_app...                                        
+
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\permission_page.dart:90:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\permission_page.dart:110:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\permission_page.dart:187:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\setup_page.dart:62:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\update_checker.dart:83:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\widgets\juhe_bottom_nav.dart:18:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\widgets\juhe_bottom_nav.dart:20:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\app\widgets\juhe_bottom_nav.dart:67:35 - deprecated_member_use
+   info - The import of 'dart:typed_data' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/foundation.dart' - lib\audio\local_music_proxy.dart:3:8 - unnecessary_import
+   info - Unnecessary 'this.' qualifier - lib\audio\player_service.dart:53:21 - unnecessary_this
+warning - The value of the field '_buffering' isn't used - lib\audio\player_service.dart:67:8 - unused_field
+   info - The private field _handlingCompletion could be 'final' - lib\audio\player_service.dart:82:8 - prefer_final_fields
+warning - The value of the field '_handlingCompletion' isn't used - lib\audio\player_service.dart:82:8 - unused_field
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:193:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:259:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:263:7 - avoid_print
+   info - Statements in an if should be enclosed in a block - lib\audio\player_service.dart:275:59 - curly_braces_in_flow_control_structures
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:401:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:547:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:551:9 - avoid_print
+warning - The stack trace variable 'st' isn't used and can be removed - lib\audio\player_service.dart:592:17 - unused_catch_stack
+   info - Statements in a for should be enclosed in a block - lib\audio\player_service.dart:668:28 - curly_braces_in_flow_control_structures
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:685:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:978:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:982:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\audio\player_service.dart:986:5 - avoid_print
+   info - Statements in an if should be enclosed in a block - lib\audio\player_service.dart:994:28 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\audio\player_service.dart:995:32 - curly_braces_in_flow_control_structures
+warning - The declaration '_checkAndRefillQueue' isn't referenced - lib\audio\player_service.dart:1152:16 - unused_element
+warning - Unused import: 'dart:math' - lib\audio\qishui_decrypt.dart:3:8 - unused_import
+   info - The 'if' statement could be replaced by a null-aware assignment - lib\audio\qishui_decrypt.dart:145:5 - prefer_conditional_assignment
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\auth\auth_page.dart:109:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\auth\auth_page.dart:132:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\auth\auth_page.dart:269:66 - deprecated_member_use
+warning - Unused import: 'package:flutter_app/home/playlist_square_page.dart' - lib\home\home_page.dart:2:8 - unused_import
+warning - Unused import: '../app/app_tabs.dart' - lib\home\home_page.dart:6:8 - unused_import
+   info - Use of 'return' in a 'finally' clause - lib\home\home_page.dart:90:21 - control_flow_in_finally
+   info - Unnecessary use of multiple underscores - lib\home\home_page.dart:259:35 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\home\home_page.dart:334:39 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:465:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:600:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:601:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:639:37 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\home\home_page.dart:748:14 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\home\home_page.dart:749:14 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:905:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:926:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:988:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\playlist_square_page.dart:101:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\playlist_square_page.dart:122:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\playlist_square_page.dart:184:43 - deprecated_member_use
+   info - Use of 'return' in a 'finally' clause - lib\player\lyrics_page.dart:97:21 - control_flow_in_finally
+   info - The private field _isNavigating could be 'final' - lib\player\mini_player_bar.dart:14:15 - prefer_final_fields
+warning - The value of the field '_isNavigating' isn't used - lib\player\mini_player_bar.dart:14:15 - unused_field
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\mini_player_bar.dart:41:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\mini_player_bar.dart:51:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\mini_player_bar.dart:52:80 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\player\now_playing_page.dart:241:30 - unnecessary_underscores
+  error - The named parameter 'index' is required, but there's no corresponding argument - lib\player\vinyl_player_demo_page.dart:121:12 - missing_required_argument
+  error - The named parameter 'onToggleMode' is required, but there's no corresponding argument - lib\player\vinyl_player_demo_page.dart:121:12 - missing_required_argument
+  error - The named parameter 'playMode' is required, but there's no corresponding argument - lib\player\vinyl_player_demo_page.dart:121:12 - missing_required_argument
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:286:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:287:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:288:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:409:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:507:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:520:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:521:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:522:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:608:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:669:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:710:39 - deprecated_member_use
+warning - The declaration '_ActionIcon' isn't referenced - lib\player\vinyl_player_page.dart:863:7 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1113:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1115:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1116:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1134:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1136:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1137:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1139:82 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1139:115 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1252:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1352:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1353:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1393:80 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1398:78 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1415:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1416:34 - deprecated_member_use
+   info - 'tolerance' is deprecated and shouldn't be used. Call toleranceFor instead. This feature was deprecated after v3.7.0-13.0.pre - lib\player\vinyl_player_page.dart:1523:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\quality_selector.dart:131:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\quality_selector.dart:131:71 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:48:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:55:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:59:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:61:86 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:77:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:80:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:35:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:59:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:60:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:61:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:67:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:103:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:113:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:121:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:145:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:163:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:164:34 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\playlist\playlist_page.dart:90:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\playlist\playlist_page.dart:97:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\playlist\playlist_page.dart:113:7 - avoid_print
+   info - Use of 'return' in a 'finally' clause - lib\playlist\playlist_page.dart:119:21 - control_flow_in_finally
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\playlist\playlist_page.dart:179:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\playlist\playlist_page.dart:293:53 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\playlist\playlist_page.dart:316:37 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\playlist\playlist_page.dart:316:72 - deprecated_member_use
+   info - The private field _platform could be 'final' - lib\search\search_page.dart:32:10 - prefer_final_fields
+   info - The private field _guess could be 'final' - lib\search\search_page.dart:38:16 - prefer_final_fields
+   info - Use of 'return' in a 'finally' clause - lib\search\search_page.dart:163:21 - control_flow_in_finally
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:233:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:266:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:396:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:439:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:527:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:601:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:617:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:619:60 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\search\search_page.dart:699:29 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:699:64 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:738:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\search\search_page.dart:740:41 - deprecated_member_use
+warning - Unused import: 'dart:math' - lib\together\together_page.dart:3:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\together\together_page.dart:62:41 - deprecated_member_use
+  error - Expected to find ']' - lib\together\together_page.dart:114:13 - expected_token
+  error - Expected an identifier - lib\together\together_page.dart:116:13 - missing_identifier
+  error - Expected to find ')' - lib\together\together_page.dart:116:13 - expected_token
+  error - Expected to find ';' - lib\together\together_page.dart:248:7 - expected_token
+warning - Dead code - lib\together\together_page.dart:248:8 - dead_code
+  error - Expected an identifier - lib\together\together_page.dart:248:8 - missing_identifier
+  error - Expected to find ';' - lib\together\together_page.dart:248:8 - expected_token
+  error - Unexpected text ';' - lib\together\together_page.dart:248:8 - unexpected_token
+  error - Expected an identifier - lib\together\together_page.dart:249:5 - missing_identifier
+  error - Unexpected text ';' - lib\together\together_page.dart:249:5 - unexpected_token
+   info - Unnecessary empty statement - lib\together\together_page.dart:249:6 - empty_statements
+   info - The prefix 'IO' isn't a lower_case_with_underscores identifier - lib\together\together_service.dart:5:60 - library_prefixes
+warning - Unused import: 'package:just_audio/just_audio.dart' - lib\together\together_service.dart:6:8 - unused_import
+warning - Unused import: 'package:just_audio_background/just_audio_background.dart' - lib\together\together_service.dart:7:8 - unused_import
+warning - The value of the field '_seekThrottle' isn't used - lib\together\together_service.dart:36:10 - unused_field
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:58:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:66:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:78:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:94:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:145:7 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:174:26 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:175:5 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:262:33 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:267:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:281:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:301:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:324:9 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:338:30 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:346:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:369:11 - avoid_print
+warning - The declaration '_mockLocalParser' isn't referenced - lib\together\together_service.dart:381:19 - unused_element
+   info - Unnecessary use of multiple underscores - lib\ui\dominant_color.dart:102:18 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\library_playlist_page.dart:108:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\library_playlist_page.dart:220:53 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\user\library_playlist_page.dart:237:37 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\library_playlist_page.dart:237:72 - deprecated_member_use
+   info - Use of 'return' in a 'finally' clause - lib\user\me_page.dart:81:21 - control_flow_in_finally
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:232:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:234:76 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:236:69 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:342:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:357:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:507:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:509:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\user\me_page.dart:599:51 - deprecated_member_use
+   info - Dangling library doc comment - packages\just_audio\example\integration_test\app_test.dart:4:1 - dangling_library_doc_comments
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\common.dart:12:9 - use_super_parameters
+  error - Target of URI doesn't exist: 'package:just_audio_example/common.dart' - packages\just_audio\example\lib\example_caching.dart:12:8 - uri_does_not_exist
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_caching.dart:18:9 - use_super_parameters
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_caching.dart:36:5 - undefined_method
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_caching.dart:62:5 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_caching.dart:81:10 - non_type_as_type_argument
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_caching.dart:82:54 - non_type_as_type_argument
+  error - The method 'PositionData' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_caching.dart:89:16 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_caching.dart:106:29 - non_type_as_type_argument
+  error - The method 'SeekBar' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_caching.dart:110:26 - undefined_method
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_caching.dart:135:9 - use_super_parameters
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\example_caching.dart:146:13 - undefined_method
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\example_caching.dart:205:15 - undefined_method
+  error - Target of URI doesn't exist: 'package:just_audio_example/common.dart' - packages\just_audio\example\lib\example_effects.dart:13:8 - uri_does_not_exist
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_effects.dart:19:9 - use_super_parameters
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_effects.dart:40:5 - undefined_method
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_effects.dart:60:5 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_effects.dart:75:10 - non_type_as_type_argument
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_effects.dart:76:56 - non_type_as_type_argument
+  error - The method 'PositionData' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_effects.dart:80:53 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_effects.dart:120:29 - non_type_as_type_argument
+  error - The method 'SeekBar' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_effects.dart:124:26 - undefined_method
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_effects.dart:144:9 - use_super_parameters
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_effects.dart:170:9 - use_super_parameters
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_effects.dart:219:9 - use_super_parameters
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_effects.dart:253:9 - use_super_parameters
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\example_effects.dart:263:13 - undefined_method
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\example_effects.dart:316:15 - undefined_method
+  error - Target of URI doesn't exist: 'package:just_audio_example/common.dart' - packages\just_audio\example\lib\example_playlist.dart:13:8 - uri_does_not_exist
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_playlist.dart:19:9 - use_super_parameters
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_playlist.dart:79:5 - undefined_method
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_playlist.dart:130:5 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_playlist.dart:145:10 - non_type_as_type_argument
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_playlist.dart:146:56 - non_type_as_type_argument
+  error - The method 'PositionData' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_playlist.dart:150:53 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\example_playlist.dart:192:29 - non_type_as_type_argument
+  error - The method 'SeekBar' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_playlist.dart:196:26 - undefined_method
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_playlist.dart:331:9 - use_super_parameters
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\example_playlist.dart:341:13 - undefined_method
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\example_playlist.dart:409:15 - undefined_method
+  error - Target of URI doesn't exist: 'package:just_audio_example/common.dart' - packages\just_audio\example\lib\example_radio.dart:11:8 - uri_does_not_exist
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_radio.dart:16:9 - use_super_parameters
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_radio.dart:28:5 - undefined_method
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\example_radio.dart:56:5 - undefined_method
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\example_radio.dart:118:9 - use_super_parameters
+  error - Target of URI doesn't exist: 'package:just_audio_example/common.dart' - packages\just_audio\example\lib\main.dart:9:8 - uri_does_not_exist
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\main.dart:15:9 - use_super_parameters
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\main.dart:27:5 - undefined_method
+  error - The method 'ambiguate' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\main.dart:56:5 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\main.dart:75:10 - non_type_as_type_argument
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\main.dart:76:56 - non_type_as_type_argument
+  error - The method 'PositionData' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\main.dart:80:53 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio\example\lib\main.dart:97:29 - non_type_as_type_argument
+  error - The method 'SeekBar' isn't defined for the type 'MyAppState' - packages\just_audio\example\lib\main.dart:101:26 - undefined_method
+   info - Parameter 'key' could be a super parameter - packages\just_audio\example\lib\main.dart:122:9 - use_super_parameters
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\main.dart:133:13 - undefined_method
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio\example\lib\main.dart:192:15 - undefined_method
+  error - Target of URI doesn't exist: 'package:just_audio_example/main.dart' - packages\just_audio\example\test\widget_test.dart:11:8 - uri_does_not_exist
+  error - The name 'MyApp' isn't a class - packages\just_audio\example\test\widget_test.dart:16:35 - creation_with_non_type
+   info - Parameters ''tag' and 'duration'' could be super parameters - packages\just_audio\lib\just_audio.dart:2355:3 - use_super_parameters
+   info - Parameters ''uri', 'headers', 'tag', and 'duration'' could be super parameters - packages\just_audio\lib\just_audio.dart:2483:3 - use_super_parameters
+   info - Parameters ''uri', 'headers', 'tag', and 'duration'' could be super parameters - packages\just_audio\lib\just_audio.dart:2510:3 - use_super_parameters
+   info - Parameter 'tag' could be a super parameter - packages\just_audio\lib\just_audio.dart:2533:3 - use_super_parameters
+   info - Parameters ''tag' and 'duration'' could be super parameters - packages\just_audio\lib\just_audio.dart:2775:3 - use_super_parameters
+   info - Parameter 'tag' could be a super parameter - packages\just_audio\lib\just_audio.dart:2839:3 - use_super_parameters
+   info - Parameter 'tag' could be a super parameter - packages\just_audio\lib\just_audio.dart:2924:3 - use_super_parameters
+  error - Target of URI doesn't exist: 'package:mockito/mockito.dart' - packages\just_audio\test\just_audio_test.dart:11:8 - uri_does_not_exist
+  error - Mixin can only be applied to class - packages\just_audio\test\just_audio_test.dart:1449:29 - mixin_with_non_class_superclass
+   info - Parameter 'tag' could be a super parameter - packages\just_audio\test\just_audio_test.dart:1831:3 - use_super_parameters
+   info - Dangling library doc comment - packages\just_audio_background\example\integration_test\app_test.dart:4:1 - dangling_library_doc_comments
+   info - Parameter 'key' could be a super parameter - packages\just_audio_background\example\lib\common.dart:12:9 - use_super_parameters
+  error - Target of URI doesn't exist: 'package:just_audio_example/common.dart' - packages\just_audio_background\example\lib\main.dart:7:8 - uri_does_not_exist
+   info - Parameter 'key' could be a super parameter - packages\just_audio_background\example\lib\main.dart:20:9 - use_super_parameters
+  error - The named parameter 'maxSkipsOnError' isn't defined - packages\just_audio_background\example\lib\main.dart:85:27 - undefined_named_parameter
+  error - The getter 'errorStream' isn't defined for the type 'AudioPlayer' - packages\just_audio_background\example\lib\main.dart:96:13 - undefined_getter
+  error - The method 'setAudioSources' isn't defined for the type 'AudioPlayer' - packages\just_audio_background\example\lib\main.dart:101:21 - undefined_method
+  error - The property 'length' can't be unconditionally accessed because the receiver can be 'null' - packages\just_audio_background\example\lib\main.dart:123:27 - unchecked_use_of_nullable_value
+  error - The method '[]' can't be unconditionally invoked because the receiver can be 'null' - packages\just_audio_background\example\lib\main.dart:124:28 - unchecked_use_of_nullable_value
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio_background\example\lib\main.dart:138:10 - non_type_as_type_argument
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio_background\example\lib\main.dart:139:56 - non_type_as_type_argument
+  error - The method 'PositionData' isn't defined for the type 'MyAppState' - packages\just_audio_background\example\lib\main.dart:143:53 - undefined_method
+  error - The name 'PositionData' isn't a type, so it can't be used as a type argument - packages\just_audio_background\example\lib\main.dart:186:29 - non_type_as_type_argument
+  error - The method 'SeekBar' isn't defined for the type 'MyAppState' - packages\just_audio_background\example\lib\main.dart:190:26 - undefined_method
+  error - The method 'moveAudioSource' isn't defined for the type 'AudioPlayer' - packages\just_audio_background\example\lib\main.dart:266:33 - undefined_method
+  error - The method 'removeAudioSourceAt' isn't defined for the type 'AudioPlayer' - packages\just_audio_background\example\lib\main.dart:281:41 - undefined_method
+  error - The method 'addAudioSource' isn't defined for the type 'AudioPlayer' - packages\just_audio_background\example\lib\main.dart:305:21 - undefined_method
+   info - Parameter 'key' could be a super parameter - packages\just_audio_background\example\lib\main.dart:325:9 - use_super_parameters
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio_background\example\lib\main.dart:335:13 - undefined_method
+  error - The getter 'playerEventStream' isn't defined for the type 'AudioPlayer' - packages\just_audio_background\example\lib\main.dart:356:22 - undefined_getter
+  error - The property 'playing' can't be unconditionally accessed because the receiver can be 'null' - packages\just_audio_background\example\lib\main.dart:359:27 - unchecked_use_of_nullable_value
+  error - The property 'playbackEvent' can't be unconditionally accessed because the receiver can be 'null' - packages\just_audio_background\example\lib\main.dart:360:27 - unchecked_use_of_nullable_value
+  error - The property 'length' can't be unconditionally accessed because the receiver can be 'null' - packages\just_audio_background\example\lib\main.dart:361:30 - unchecked_use_of_nullable_value
+  error - The property 'first' can't be unconditionally accessed because the receiver can be 'null' - packages\just_audio_background\example\lib\main.dart:392:56 - unchecked_use_of_nullable_value
+  error - The method 'showSliderDialog' isn't defined for the type 'ControlButtons' - packages\just_audio_background\example\lib\main.dart:411:15 - undefined_method
+  error - Target of URI doesn't exist: 'package:just_audio_example/main.dart' - packages\just_audio_background\example\test\widget_test.dart:11:8 - uri_does_not_exist
+  error - The name 'MyApp' isn't a class - packages\just_audio_background\example\test\widget_test.dart:16:35 - creation_with_non_type
+

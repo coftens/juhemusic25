@@ -1,0 +1,35 @@
+Analyzing 2 items...                                            
+
+warning - Unused import: 'package:flutter_app/home/playlist_square_page.dart' - lib\home\home_page.dart:2:8 - unused_import
+warning - Unused import: '../app/app_tabs.dart' - lib\home\home_page.dart:6:8 - unused_import
+   info - Use of 'return' in a 'finally' clause - lib\home\home_page.dart:90:21 - control_flow_in_finally
+   info - Unnecessary use of multiple underscores - lib\home\home_page.dart:259:35 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\home\home_page.dart:334:39 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:465:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:600:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:601:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:639:37 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\home\home_page.dart:748:14 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\home\home_page.dart:749:14 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:905:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:926:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:988:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\together\together_page.dart:61:41 - deprecated_member_use
+   info - The prefix 'IO' isn't a lower_case_with_underscores identifier - lib\together\together_service.dart:5:60 - library_prefixes
+warning - The value of the field '_seekThrottle' isn't used - lib\together\together_service.dart:34:10 - unused_field
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:51:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:59:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:71:7 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:149:26 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:150:5 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:237:33 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:242:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:262:15 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:268:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:269:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:276:15 - avoid_print
+  error - The method 'MediaItem' isn't defined for the type 'TogetherService' - lib\together\together_service.dart:282:28 - undefined_method
+   info - Missing type annotation - lib\together\together_service.dart:322:30 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:331:11 - avoid_print
+
+31 issues found. (ran in 1.3s)

@@ -1,0 +1,98 @@
+Analyzing 3 items...                                            
+
+warning - Unused import: 'package:flutter_app/home/playlist_square_page.dart' - lib\home\home_page.dart:2:8 - unused_import
+warning - Unused import: '../app/app_tabs.dart' - lib\home\home_page.dart:6:8 - unused_import
+   info - Use of 'return' in a 'finally' clause - lib\home\home_page.dart:90:21 - control_flow_in_finally
+   info - Unnecessary use of multiple underscores - lib\home\home_page.dart:259:35 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\home\home_page.dart:334:39 - unnecessary_underscores
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:465:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:600:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:601:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:639:37 - deprecated_member_use
+   info - Invalid use of a private type in a public API - lib\home\home_page.dart:748:14 - library_private_types_in_public_api
+   info - Invalid use of a private type in a public API - lib\home\home_page.dart:749:14 - library_private_types_in_public_api
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:905:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:926:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\home_page.dart:988:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\playlist_square_page.dart:101:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\playlist_square_page.dart:122:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\home\playlist_square_page.dart:184:43 - deprecated_member_use
+   info - Use of 'return' in a 'finally' clause - lib\player\lyrics_page.dart:97:21 - control_flow_in_finally
+   info - The private field _isNavigating could be 'final' - lib\player\mini_player_bar.dart:14:15 - prefer_final_fields
+warning - The value of the field '_isNavigating' isn't used - lib\player\mini_player_bar.dart:14:15 - unused_field
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\mini_player_bar.dart:41:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\mini_player_bar.dart:51:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\mini_player_bar.dart:52:80 - deprecated_member_use
+   info - Unnecessary use of multiple underscores - lib\player\now_playing_page.dart:241:30 - unnecessary_underscores
+  error - The named parameter 'index' is required, but there's no corresponding argument - lib\player\vinyl_player_demo_page.dart:121:12 - missing_required_argument
+  error - The named parameter 'onToggleMode' is required, but there's no corresponding argument - lib\player\vinyl_player_demo_page.dart:121:12 - missing_required_argument
+  error - The named parameter 'playMode' is required, but there's no corresponding argument - lib\player\vinyl_player_demo_page.dart:121:12 - missing_required_argument
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:286:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:287:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:288:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:409:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:507:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:520:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:521:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:522:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:608:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:669:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:710:39 - deprecated_member_use
+warning - The declaration '_ActionIcon' isn't referenced - lib\player\vinyl_player_page.dart:863:7 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1113:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1115:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1116:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1134:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1136:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1137:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1139:82 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1139:115 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1252:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1352:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1353:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1393:80 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1398:78 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1415:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\vinyl_player_page.dart:1416:34 - deprecated_member_use
+   info - 'tolerance' is deprecated and shouldn't be used. Call toleranceFor instead. This feature was deprecated after v3.7.0-13.0.pre - lib\player\vinyl_player_page.dart:1523:28 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\quality_selector.dart:131:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\quality_selector.dart:131:71 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:48:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:55:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:59:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:61:86 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:77:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\stylus_arm.dart:80:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:35:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:59:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:60:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:61:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:67:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:103:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:113:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:121:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:145:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:163:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\player\widgets\vinyl_disc.dart:164:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\together\together_page.dart:61:41 - deprecated_member_use
+   info - The prefix 'IO' isn't a lower_case_with_underscores identifier - lib\together\together_service.dart:5:60 - library_prefixes
+warning - Unused import: 'package:just_audio/just_audio.dart' - lib\together\together_service.dart:6:8 - unused_import
+warning - Unused import: 'package:just_audio_background/just_audio_background.dart' - lib\together\together_service.dart:7:8 - unused_import
+warning - Unused import: '../storage/user_library.dart' - lib\together\together_service.dart:10:8 - unused_import
+warning - The value of the field '_seekThrottle' isn't used - lib\together\together_service.dart:36:10 - unused_field
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:53:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:61:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:73:7 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:151:26 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:152:5 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:239:33 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:244:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:258:7 - avoid_print
+  error - The method 'SearchItem' isn't defined for the type 'TogetherService' - lib\together\together_service.dart:265:20 - undefined_method
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:278:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:301:9 - avoid_print
+   info - Missing type annotation - lib\together\together_service.dart:315:30 - strict_top_level_inference
+   info - Don't invoke 'print' in production code - lib\together\together_service.dart:324:11 - avoid_print
+warning - The declaration '_mockLocalParser' isn't referenced - lib\together\together_service.dart:336:19 - unused_element
+
+94 issues found. (ran in 1.5s)
