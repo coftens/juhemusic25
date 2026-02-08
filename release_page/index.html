@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>悦往音乐 - 下载</title>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #FF5A54 0%, #FF8C7B 100%);
+            --bg-color: #141A16;
+            --text-color: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            /* Use dvh for mobile to handle address bar better */
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            /* Dynamic Background */
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(255, 90, 84, 0.25) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(84, 90, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+            background-size: 200% 200%;
+            animation: bgMove 15s ease infinite alternate;
+        }
+
+        @keyframes bgMove {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 32px 24px;
+            box-sizing: border-box;
+            text-align: center;
+            /* Visual Center Correction: slightly shift up */
+            transform: translateY(-20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(-20px);
+            }
+        }
+
+        .logo-container {
+            width: 128px;
+            height: 128px;
+            margin: 0 auto 32px;
+            border-radius: 32px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(1deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* Ensure full logo is visible/centered */
+            transition: transform 0.5s ease;
+            /* Fix for some images having built-in padding */
+            display: block;
+        }
+
+        .logo-container:hover img {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 36px;
+            margin: 0 0 12px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #ddd);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        p.subtitle {
+            margin: 0 0 48px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .download-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            font-size: 17px;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .download-btn:active::before {
+            opacity: 1;
+        }
+
+        .download-btn icon {
+            margin-right: 12px;
+            font-size: 24px;
+        }
+
+        .btn-android {
+            background: var(--primary-gradient);
+            box-shadow: 0 10px 30px rgba(255, 90, 84, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: none;
+        }
+
+        .btn-android:active {
+            transform: scale(0.96);
+            box-shadow: 0 5px 15px rgba(255, 90, 84, 0.2);
+        }
+
+        .btn-android:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(255, 90, 84, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-ios {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-ios:active {
+            transform: scale(0.96);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-ios:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .version-info {
+            margin-top: 40px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        /* SVG Icons */
+        .icon-android,
+        .icon-apple {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            fill: currentColor;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                /* Remove fixed min-height on container to let body align it,
+                   or set it carefully to avoid fighting body flex */
+                min-height: auto;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .logo-container {
+                width: 110px;
+                height: 110px;
+                margin-bottom: 24px;
+            }
+
+            p.subtitle {
+                margin-bottom: 32px;
+                font-size: 15px;
+            }
+
+            .download-btn {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .version-info {
+                margin-top: auto;
+                padding-top: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Yuewang Music Logo">
+        </div>
+
+        <h1>悦往音乐</h1>
+        <p class="subtitle">一起听 · 高品质 · 无损音质<br>The Best Shared Music Experience</p>
+
+        <a href="http://yunhezi.am80.cn:8887/filedown/b554edec2030f491c0f74ff5d0c24eb8/yuewang-release-v7.20.0.apk"
+            class="download-btn btn-android">
+            <svg class="icon-android" viewBox="0 0 24 24">
+                <path
+                    d="M17.523 15.3414C17.523 15.3414 17.564 15.3374 17.584 15.3374C17.755 15.3374 17.922 15.4224 18.019 15.5654L18.845 16.7864C18.966 16.9644 18.919 17.2064 18.739 17.3274L17.362 18.2574L18.334 19.6954C18.455 19.8734 18.408 20.1154 18.228 20.2364L17.228 20.9124C17.049 21.0334 16.806 20.9864 16.685 20.8064L15.713 19.3694L14.336 20.2994C14.336 20.2994 14.336 20.2994 14.336 20.3004C13.626 20.7224 12.827 20.9414 12.001 20.9414C11.173 20.9414 10.375 20.7224 9.664 20.3004L8.288 21.2294C8.167 21.3504 7.971 21.3284 7.828 21.2294L6.828 20.5534C6.649 20.4324 6.602 20.1904 6.723 20.0124L7.695 18.5744L6.318 17.6444C6.138 17.5234 6.091 17.2814 6.212 17.1034L7.039 15.8814C7.135 15.7394 7.302 15.6544 7.473 15.6544C7.493 15.6544 7.534 15.6584 7.534 15.6584C8.835 14.8874 10.369 14.4444 12.001 14.4444C13.632 14.4444 15.166 14.8874 16.467 15.6584L17.523 15.3414ZM12.001 13.3334C7.582 13.3334 4 9.7514 4 5.3334H20.001C20.001 9.7514 16.419 13.3334 12.001 13.3334ZM7.501 8.8334C7.501 8.0054 8.172 7.3334 9.001 7.3334C9.829 7.3334 10.501 8.0054 10.501 8.8334C10.501 9.6614 9.829 10.3334 9.001 10.3334C8.172 10.3334 7.501 9.6614 7.501 8.8334ZM13.501 8.8334C13.501 8.0054 14.172 7.3334 15.001 7.3334C15.829 7.3334 16.501 8.0054 16.501 8.8334C16.501 9.6614 15.829 10.3334 15.001 10.3334C14.172 10.3334 13.501 9.6614 13.501 8.8334Z" />
+            </svg>
+            Android 下载 (v7.20.0)
+        </a>
+
+        <a href="http://yunhezi.am80.cn:8887/filedown/357943dcec9d5bcfd728b0cba211da61/juhemusic (24).ipa"
+            class="download-btn btn-ios">
+            <svg class="icon-apple" viewBox="0 0 24 24">
+                <path
+                    d="M17.848 14.004C17.818 11.587 19.864 10.323 19.957 10.269C18.868 8.683 17.18 8.441 16.598 8.411C15.174 8.261 13.844 9.254 13.12 9.254C12.396 9.254 11.238 8.423 10.052 8.448C8.52 8.468 7.106 9.336 6.323 10.702C4.717 13.483 5.922 17.575 7.481 19.839C8.24 20.957 9.155 22.186 10.384 22.145C11.564 22.097 12.012 21.432 13.443 21.432C14.869 21.432 15.275 22.145 16.516 22.12C17.801 22.078 18.604 20.932 19.348 19.818C20.219 18.552 20.574 17.323 20.589 17.234C20.569 17.226 17.868 16.19 17.848 14.004ZM14.996 6.467C15.654 5.672 16.103 4.568 15.98 3.5C15.056 3.539 13.922 4.12 13.251 4.908C12.656 5.597 12.131 6.721 12.274 7.771C13.303 7.847 14.364 7.245 14.996 6.467Z" />
+            </svg>
+            iOS 下载 (.ipa v7.20.0)
+        </a>
+
+        <div class="version-info">
+            <p>Version 7.20.0 (Build 2)</p>
+            <p>&copy; 2026 Yuewang Music</p>
+        </div>
+    </div>
+</body>
+
+</html>
