@@ -1,0 +1,109 @@
+=== 音质记忆与下一级音质功能修复 ===
+
+## 需要的修改
+
+### 1. 在 player_service.dart 中添加音质优先级列表
+位置：在 _qOrder 常量后面添加
+
+```dart
+// 音质优先级列表（从高到低）
+static const List<String> _wyyQualityPriority = [
+  'jymaster',  // 超清母带
+  'sky',       // 沉浸环绕声
+  'jyeffect',  // 高清环绕声
+  'hires',     // Hi-Res音质
+  'lossless',  // 无损音质
+  'exhigh',    // 极高音质
+  'standard',   // 标准音质
+];
+
+static const List<String> _qqQualityPriority = [
+  'atmos_51',  // 臻品音质 2.0 (5.1声道)
+  'atmos_2',   // 臻品全景声 2.0
+  'master',     // 臻品母带 3.0
+  'hires',      // Hi-Res音质
+  'flac',      // SQ 无损品质
+  '320',        // HQ 高品质 320kbps
+  'ogg_320',    // OGG 高品质 320kbps
+  'aac_192',    // AAC 高品质 192kbps
+  'ogg_192',    // OGG 标准 192kbps
+  '128',        // 标准 128kbps
+  'aac_96',     // AAC 标准 96kbps
+];
+```
+
+### 2. 添加 toggleNextQuality() 方法
+位置：在 toggleFavoriteCurrent() 方法后面
+
+```dart
+  // 切换到下一个可用音质（下一级音质）
+  Future<void> toggleNextQuality() async {
+    if (_current == null) return;
+    
+    final platform = _current!.platform;
+    final currentQuality = _quality;
+    
+    // 根据平台选择优先级列表
+    final qualityPriority = platform == 'wyy' ? _wyyQualityPriority : _qqQualityPriority;
+    
+    // 找到当前音质在优先级列表中的位置
+    final currentIndex = qualityPriority.indexOf(currentQuality);
+    if (currentIndex == -1) {
+      debugPrint('Current quality not in priority list: $currentQuality');
+      return;
+    }
+    
+    // 计算下一个音质（循环到最后一个后回到第一个）
+    final nextIndex = (currentIndex + 1) % qualityPriority.length;
+    final nextQuality = qualityPriority[nextIndex];
+    
+    debugPrint('Toggling quality: $currentQuality -> $nextQuality (platform: $platform)');
+    await setQuality(nextQuality);
+  }
+```
+
+### 3. 修改 _handleTrackCompleted() 方法
+找到这一行：
+```dart
+await playItem(_queue[_index]);
+```
+
+修改为：
+```dart
+// 获取下一首歌曲的音质偏好
+final nextSong = _queue[_index];
+final platformQuality = nextSong.platform == 'wyy' ? _prefWyy : _prefQq;
+
+debugPrint('Auto-playing next song: index=$_index (platform=${nextSong.platform}, quality=$platformQuality)');
+await playItem(_queue[_index], quality: platformQuality);
+```
+
+## 功能说明
+
+1. 用户手动切换音质时：
+   - setQuality() 方法会更新 _prefWyy 或 _prefQq
+   - 然后这些偏好被保存到 SharedPreferences
+
+2. 点击"下一级音质"按钮时：
+   - toggleNextQuality() 会根据平台循环切换音质
+   - 不会改变 _prefWyy 或 _prefQq
+   - 所以"下一级音质"按钮只是一个快捷方式
+
+3. 自动播放下一首时：
+   - _handleTrackCompleted() 使用平台的偏好音质（_prefWyy 或 _prefQq）
+   - 这样就使用了用户最后一次手动选择的音质
+
+## 测试方法
+
+1. 编译安装 APK
+2. 点击播放一首歌
+3. 手动切换音质到高音质（如 FLAC）
+4. 手动切换到标准音质（128kbps）
+5. 点击"下一级音质"按钮多次，观察音质循环
+6. 等待歌曲播放完成，观察自动播放下一首时使用的音质
+
+## 预期行为
+
+- 手动切换音质后：该平台的所有歌曲使用新音质
+- 点击"下一级音质"：切换音质但不改变偏好（只是临时切换）
+- 自动播放下一首：使用用户最后一次手动选择的音质（_prefWyy 或 _prefQq）

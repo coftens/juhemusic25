@@ -1,0 +1,27 @@
+﻿<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:MusicLyricApp.ViewModels"
+    mc:Ignorable="d"
+    x:Class="MusicLyricApp.Views.BlurSearchView"
+    x:DataType="viewModels:BlurSearchViewModel"
+    d:DesignWidth="620" d:DesignHeight="396">
+
+    <Border>
+        <DataGrid x:Name="BlurDataGrid"
+                  ItemsSource="{Binding SearchResults}"
+                  AutoGenerateColumns="False"
+                  Background="White"
+                  RowBackground="LightGray"
+                  Foreground="Black"
+                  RowHeight="32">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="下载" Command="{Binding DownloadSelectedCommand}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+    </Border>
+</UserControl>

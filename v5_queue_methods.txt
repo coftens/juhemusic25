@@ -1,0 +1,174 @@
+// ==================== v5.0 队列管理核心方法 ====================
+// 将此代码块插入到 player_service.dart 的第 432 行（_loadRecommendations 方法之后）
+
+/// 从指定来源初始化播放队列 (限量加载)
+Future<void> initQueueFromSource({
+  required QueueSource source,
+  String? playlistId,
+  List<SearchItem>? initialItems,
+}) async {
+  debugPrint('[Queue] Initializing from source: $source, playlistId: $playlistId');
+  
+  _queue.clear();
+  await _playlist.clear();
+  _index = 0;
+  _orderPos = 0;
+  
+  List<SearchItem> items = [];
+  List<String> sourceIds = [];
+  
+  if (initialItems != null && initialItems.isNotEmpty) {
+    items = initialItems.take(3).toList();
+    sourceIds = initialItems.map((e) => e.id ?? e.shareUrl).toList();
+  } else if (source == QueueSource.qishuiRecommend) {
+    items = await _api.getQishuiFeed(count: 3);
+    sourceIds = [];
+  } else if (source == QueueSource.dailyRecommend) {
+    final allDaily = await _api.getQishuiFeed(count: 20);
+    items = allDaily.take(3).toList();
+    sourceIds = allDaily.map((e) => e.id ?? e.shareUrl).toList();
+  } else if (source == QueueSource.playlist && playlistId != null) {
+    final playlistData = await _api.getPlaylistDetail(playlistId);
+    final allTracks = playlistData['tracks'] as List<SearchItem>;
+    items = allTracks.take(3).toList();
+    sourceIds = allTracks.map((e) => e.id ?? e.shareUrl).toList();
+  }
+  
+  if (items.isEmpty) {
+    debugPrint('[Queue] Warning: No items loaded');
+    return;
+  }
+  
+  _queueContext = QueueContext(
+    source: source,
+    playlistId: playlistId,
+    sourceItemIds: sourceIds,
+    loadedCount: items.length,
+  );
+  
+  _queue = items;
+  await _rebuildOrder(startIndex: 0);
+  
+  debugPrint('[Queue] Initialized: ${items.length} songs');
+  notifyListeners();
+}
+
+/// 检查并触发队列补货
+Future<void> _checkAndRefillQueue() async {
+  if (_queueContext == null) return;
+  
+  if (_index >= _queue.length - 1) {
+    debugPrint('[Queue] Refill triggered at index $_index/${_queue.length}');
+    
+    if (_queueContext!.source == QueueSource.playlist) {
+      await _refillFromPlaylist();
+    } else if (_queueContext!.source == QueueSource.dailyRecommend) {
+      if (_queueContext!.hasMoreFromSource) {
+        await _refillFromDailyRecommend();
+      } else {
+        debugPrint('[Queue] Daily exhausted, switching to qishui');
+        await _refillFromQishui();
+      }
+    } else {
+      await _refillFromQishui();
+    }
+  }
+}
+
+/// 从歌单补货
+Future<void> _refillFromPlaylist() async {
+  if (!_queueContext!.hasMoreFromSource) {
+    debugPrint('[Queue] Playlist exhausted');
+    return;
+  }
+  
+  final start = _queueContext!.loadedCount;
+  final end = min(start + 3, _queueContext!.sourceItemIds.length);
+  final nextIds = _queueContext!.sourceItemIds.sublist(start, end);
+  
+  debugPrint('[Queue] Loading playlist songs $start-${end-1}');
+  
+  final items = await _fetchPlaylistItemsByIds(_queueContext!.playlistId!, nextIds);
+  
+  _queue.addAll(items);
+  await _syncPlaylist();
+  
+  _queueContext = _queueContext!.copyWith(loadedCount: end);
+  debugPrint('[Queue] Added ${items.length} from playlist');
+  notifyListeners();
+}
+
+/// 从每日推荐补货
+Future<void> _refillFromDailyRecommend() async {
+  final start = _queueContext!.loadedCount;
+  final end = min(start + 3, _queueContext!.sourceItemIds.length);
+  
+  debugPrint('[Queue] Loading daily recommend $start-${end-1}');
+  
+  final nextIds = _queueContext!.sourceItemIds.sublist(start, end);
+  final items = await _fetchDailyRecommendItemsByIds(nextIds);
+  
+  _queue.addAll(items);
+  await _syncPlaylist();
+  
+  _queueContext = _queueContext!.copyWith(loadedCount: end);
+  debugPrint('[Queue] Added ${items.length} from daily');
+  notifyListeners();
+}
+
+/// 从汽水API补货
+Future<void> _refillFromQishui() async {
+  debugPrint('[Queue] Loading from qishui');
+  
+  final items = await _api.getQishuiFeed(count: 3);
+  
+  final existing = _queue.map((e) => e.shareUrl).toSet();
+  final newItems = items.where((e) => !existing.contains(e.shareUrl)).toList();
+  
+  if (newItems.isEmpty) {
+    debugPrint('[Queue] Warning: Qishui returned no new songs');
+    return;
+  }
+  
+  _queue.addAll(newItems);
+  await _syncPlaylist();
+  
+  debugPrint('[Queue] Added ${newItems.length} from qishui');
+  notifyListeners();
+}
+
+/// 心动页面空队列保护
+Future<void> ensureQueueNotEmpty() async {
+  if (_queue.isEmpty) {
+    debugPrint('[Queue] Empty queue, loading qishui songs');
+    await initQueueFromSource(source: QueueSource.qishuiRecommend);
+    if (_queue.isNotEmpty) {
+      await playItem(_queue[0], autoPlay: true);
+    }
+  }
+}
+
+/// 辅助方法: 获取歌单歌曲详情
+Future<List<SearchItem>> _fetchPlaylistItemsByIds(String playlistId, List<String> ids) async {
+  try {
+    final playlistData = await _api.getPlaylistDetail(playlistId);
+    final allTracks = playlistData['tracks'] as List<SearchItem>;
+    return allTracks.where((t) => ids.contains(t.id ?? t.shareUrl)).toList();
+  } catch (e) {
+    debugPrint('[Queue] Error fetching playlist items: $e');
+    return [];
+  }
+}
+
+/// 辅助方法: 获取每日推荐歌曲详情
+Future<List<SearchItem>> _fetchDailyRecommendItemsByIds(List<String> ids) async {
+  try {
+    final allDaily = await _api.getQishuiFeed(count: 20);
+    return allDaily.where((t) => ids.contains(t.id ?? t.shareUrl)).toList();
+  } catch (e) {
+    debugPrint('[Queue] Error fetching daily items: $e');
+    return [];
+  }
+}
+
+// ==================== v5.0 队列管理方法结束 ====================

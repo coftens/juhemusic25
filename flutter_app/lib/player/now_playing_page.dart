@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import '../api/php_api_client.dart';
 import '../audio/player_service.dart';
 import '../together/together_service.dart';
 import '../widgets/cached_cover_image.dart';
+import 'ar_lyrics_page.dart';
 import 'vinyl_player_page.dart';
 
 class NowPlayingPage extends StatefulWidget {
@@ -204,6 +206,9 @@ class _NowPlayingPageState extends State<NowPlayingPage> {
             }
           },
           onOpenQueue: () => _openQueue(context),
+          onOpenArLyrics: Platform.isIOS
+              ? () => ArLyricsPage.push(context, item: it)
+              : null,
           onSeek: (d) {
             if (TogetherService().isConnected && !TogetherService().isHost) {
               ScaffoldMessenger.of(context).showSnackBar(

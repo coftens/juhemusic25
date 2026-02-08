@@ -1,0 +1,139 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MusicLyricApp.ViewModels"
+        x:Class="MusicLyricApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Resources/app-logo.ico"
+        Title="{Binding AppTitle}"
+        Width="720"
+        Height="680">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel>
+        <DockPanel.KeyBindings>
+            <KeyBinding Gesture="Enter" Command="{Binding ExecuteSearchCommand}" />
+            <KeyBinding Gesture="Ctrl+Enter" Command="{Binding ExecuteBlurSearchCommand}" />
+            <KeyBinding Gesture="Ctrl+S" Command="{Binding ExecuteSaveCommand}" />
+        </DockPanel.KeyBindings>
+
+        <!-- 顶部菜单 -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="项目主页" Command="{Binding ExecuteHomeCommand}" />
+            <MenuItem Header="使用手册" Command="{Binding ExecuteWikiCommand}" />
+            <MenuItem Header="问题反馈" Command="{Binding ExecuteIssueCommand}" />
+            <MenuItem Header="检查更新" Command="{Binding ExecuteVersionCheckCommand}" />
+            <MenuItem Header="快捷键" Command="{Binding ExecuteShortCutCommand}" />
+            <MenuItem Header="更多设置" Command="{Binding ExecuteSettingCommand}" />
+        </Menu>
+
+        <!-- 主内容区域 -->
+        <ScrollViewer>
+            <StackPanel Orientation="Vertical" Margin="16" Spacing="10" HorizontalAlignment="Stretch">
+
+                <!-- 搜索区域 -->
+                <WrapPanel ItemSpacing="8">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="搜索源" Width="70" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding SearchParamViewModel.SearchSources}"
+                                  SelectedItem="{Binding SearchParamViewModel.SelectedSearchSourceItem}"
+                                  MinWidth="120" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="歌词格式" Width="70" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding SearchParamViewModel.LrcTypes}"
+                                  SelectedItem="{Binding SearchParamViewModel.SelectedLrcTypeItem}"
+                                  MinWidth="120" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="歌词合并符" Width="80" VerticalAlignment="Center" />
+                        <TextBox MinWidth="70"
+                                 Text="{Binding SearchParamViewModel.LrcMergeSeparator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <Button Content="模糊搜索" Width="100" Height="30" Margin="0,0,8,8"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Command="{Binding ExecuteBlurSearchCommand}" />
+                </WrapPanel>
+
+                <!-- 第二行搜索控件 -->
+                <WrapPanel ItemSpacing="8">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="搜索类型" Width="70" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding SearchParamViewModel.SearchTypes}"
+                                  SelectedItem="{Binding SearchParamViewModel.SelectedSearchTypeItem}"
+                                  MinWidth="120" />
+                    </StackPanel>
+
+                    <TextBox Name="SearchTextBox" Width="222" Height="30" Margin="0,0,8,8"
+                             Text="{Binding SearchParamViewModel.SearchText}" />
+
+                    <Button Content="直链" Width="50" Height="30" Margin="0,0,8,8"
+                            Command="{Binding ExecuteSongLinkCommand}" />
+                    <Button Content="封面" Width="50" Height="30" Margin="0,0,8,8"
+                            Command="{Binding ExecuteSongPicCommand}" />
+                    <Button Content="精确搜索" Width="100" Height="30" Margin="0,0,8,8"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Command="{Binding ExecuteSearchCommand}" />
+                </WrapPanel>
+
+                <!-- 信息显示区域 -->
+                <WrapPanel ItemSpacing="8">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="歌手：" Width="50" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding SearchResultViewModel.Singer, Mode=OneWay}" Width="163"
+                                 IsReadOnly="True" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="歌名：" Width="50" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding SearchResultViewModel.SongName, Mode=OneWay}" Width="163"
+                                 IsReadOnly="True" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="专辑：" Width="50" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding SearchResultViewModel.Album, Mode=OneWay}" Width="163"
+                                 IsReadOnly="True" />
+                    </StackPanel>
+                </WrapPanel>
+
+                <!-- 控制台输出 -->
+                <TextBox Text="{Binding SearchResultViewModel.ConsoleOutput, Mode=OneWay}"
+                         Height="400" Margin="0,8,0,0"
+                         TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" />
+
+                <!-- 底部设置区域 -->
+                <WrapPanel ItemSpacing="4">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="输出格式" Width="70" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding SearchParamViewModel.OutputFormats}"
+                                  SelectedItem="{Binding SearchParamViewModel.SelectedOutputFormatItem}"
+                                  MinWidth="130" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,8,8">
+                        <TextBlock Text="文件编码" Width="70" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding SearchParamViewModel.OutputEncodings}"
+                                  SelectedItem="{Binding SearchParamViewModel.SelectedOutputEncodingItem}"
+                                  MinWidth="130" />
+                    </StackPanel>
+
+                    <Ellipse Fill="{Binding LampVm.LampColor}"
+                             ToolTip.Tip="{Binding LampVm.Details}"
+                             Stroke="Gray" StrokeThickness="1.5" Width="18" Height="18" Margin="10,0,8,8"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" >
+                    </Ellipse>
+
+                    <Button Content="保存" Width="200" Height="30" Margin="10,0,8,8"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Command="{Binding ExecuteSaveCommand}" />
+                </WrapPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

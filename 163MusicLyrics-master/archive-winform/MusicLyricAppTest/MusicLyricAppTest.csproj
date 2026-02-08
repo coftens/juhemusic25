@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{9D302133-2ABB-4099-8573-2007EBE28A22}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <RootNamespace>MusicLyricAppTest</RootNamespace>
+        <AssemblyName>MusicLyricAppTest</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug</OutputPath>
+        <DefineConstants>DEBUG;</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release</OutputPath>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+          <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+        </Reference>
+        <Reference Include="System" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="hyjiacan.pinyin4net" Version="4.1.1" />
+        <PackageReference Include="Kawazu" Version="1.1.4" />
+        <PackageReference Include="Markdig" Version="0.30.4" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+        <PackageReference Include="NTextCat" Version="0.3.65" />
+        <PackageReference Include="NUnit" Version="3.13.3" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="Api\Music\NetEaseMusicApi.cs" />
+      <Compile Include="Api\Music\NetEaseMusicNativeApi.cs" />
+      <Compile Include="Api\Music\QQMusicApi.cs" />
+      <Compile Include="Api\Music\QQMusicNativeApi.cs" />
+      <Compile Include="Api\Translate\BaiduTranslateApi.cs" />
+      <Compile Include="Api\Translate\CaiYunTranslateApi.cs" />
+      <Compile Include="Bean\CsvBeanTest.cs" />
+      <Compile Include="Bean\LyricTimestampTest.cs" />
+      <Compile Include="Bean\MusicLyricsVOTest.cs" />
+      <Compile Include="Utils\GlobalUtilsTest.cs" />
+      <Compile Include="Utils\LyricUtilsTest.cs" />
+      <Compile Include="Utils\NetEaseMusicSearchUtils.cs" />
+      <Compile Include="Utils\PinyinTest.cs" />
+      <Compile Include="Utils\SrtUtilsTest.cs" />
+      <Compile Include="Utils\XmlUtils.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\MusicLyricApp\MusicLyricApp.csproj">
+        <Project>{a8897401-6ee2-4c86-a56a-59ccf37a5974}</Project>
+        <Name>Application</Name>
+      </ProjectReference>
+    </ItemGroup>
+    <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

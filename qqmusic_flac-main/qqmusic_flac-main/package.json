@@ -1,0 +1,27 @@
+{
+  "name": "qqmusic-api-server",
+  "version": "1.0.0",
+  "description": "QQ音乐解析API服务器",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "qqmusic",
+    "api",
+    "music",
+    "nodejs",
+    "express"
+  ],
+  "author": "QQ音乐API服务",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

@@ -43,6 +43,7 @@ class VinylPlayerPage extends StatefulWidget {
     required this.onOpenQueue,
     required this.onSeek,
     required this.onSelectQuality,
+    this.onOpenArLyrics,
     this.onTapDisc,
   });
 
@@ -72,6 +73,7 @@ class VinylPlayerPage extends StatefulWidget {
   final VoidCallback onOpenQueue;
   final ValueChanged<Duration> onSeek;
   final ValueChanged<String> onSelectQuality;
+  final VoidCallback? onOpenArLyrics;
   final VoidCallback? onTapDisc;
 
   @override
@@ -434,6 +436,7 @@ class _VinylPlayerPageState extends State<VinylPlayerPage>
                   availableQualities: widget.availableQualities,
                   qualitiesLoading: widget.qualitiesLoading,
                   onSelectQuality: widget.onSelectQuality,
+                  onOpenArLyrics: widget.onOpenArLyrics,
                 ),
                 const SizedBox(height: 6),
                 _ProgressBar(
@@ -694,6 +697,7 @@ class _MetaAndActions extends StatelessWidget {
     required this.availableQualities,
     required this.qualitiesLoading,
     required this.onSelectQuality,
+    required this.onOpenArLyrics,
   });
 
   final String title;
@@ -705,6 +709,7 @@ class _MetaAndActions extends StatelessWidget {
   final Map<String, String> availableQualities;
   final bool qualitiesLoading;
   final ValueChanged<String> onSelectQuality;
+  final VoidCallback? onOpenArLyrics;
 
   String _qualityLabel() {
     return switch (selectedQuality) {
@@ -908,6 +913,27 @@ class _MetaAndActions extends StatelessWidget {
           const SizedBox(width: 10),
           Row(
             children: [
+              if (onOpenArLyrics != null)
+                InkResponse(
+                  onTap: onOpenArLyrics,
+                  radius: 22,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Icon(Icons.view_in_ar_rounded, color: Colors.white70, size: 28),
+                      const SizedBox(height: 2),
+                      Text(
+                        'AR歌词',
+                        style: text.labelSmall?.copyWith(
+                          color: Colors.white60,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (onOpenArLyrics != null) const SizedBox(width: 8),
               _FavAction(
                 active: favorite,
                 onTap: onToggleFavorite,
