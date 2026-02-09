@@ -216,7 +216,6 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       geometry: geometry,
       position: position,
       scale: vec.Vector3.all(0.048), // 进一步增大到0.048，接近参考视频的字体大小
-      constraints: [ARKitBillboardConstraint()],
     );
 
     _arkit?.add(node);
@@ -284,27 +283,15 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   }
 
   vec.Vector3 _positionInFrontOfCamera(double distance, int index) {
-    final camera = _arkit?.cameraTransform;
     final height = _getHeightForIndex(index);
-    if (camera == null) {
-      return vec.Vector3(0, height, -distance);
-    }
-
-    final camPos = camera.getTranslation();
-    final forward = vec.Vector3(
-      -camera.entry(0, 2),
-      -camera.entry(1, 2),
-      -camera.entry(2, 2),
-    );
-    final dir = forward.length2 == 0 ? vec.Vector3(0, 0, -1) : forward.normalized();
-    final basePos = camPos + dir * distance;
-    return vec.Vector3(basePos.x, basePos.y + height, basePos.z);
+    // 直接返回相对于摄像头的位置（ARKit会自动处理相对坐标）
+    return vec.Vector3(0, height, -distance);
   }
 
   vec.Vector3? _cameraPosition() {
-    final camera = _arkit?.cameraTransform;
-    if (camera == null) return null;
-    return camera.getTranslation();
+    // arkit_plugin 1.3.0 不支持直接获取相机位置
+    // 假设摄像头始终在原点，并使用相对坐标
+    return vec.Vector3.zero();
   }
 
   void _checkPassThrough() {
@@ -315,8 +302,16 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     final camPos = _cameraPosition();
     if (camPos == null) return;
 
-    final dist = (camPos - _currentNode!.position).length;
-    if (dist > 0.7) return;
+    // 相机和歌词节点的Y轴距离
+    final distY = (camPos.y - _currentNode!.position.y).abs();
+    // 相机和歌词节点的XZ平面距离
+    final distXZ = math.sqrt(
+      (_currentNode!.position.x * _currentNode!.position.x) +
+      (_currentNode!.position.z * _currentNode!.position.z),
+    );
+    // 综合距离（当相机接近5m处的歌词时触发）
+    final totalDist = math.sqrt(distY * distY + distXZ * distXZ);
+    if (totalDist > 0.7) return;
 
     final fading = _currentNode;
     _currentNode = null;
