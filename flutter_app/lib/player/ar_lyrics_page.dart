@@ -55,6 +55,12 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   // ── 相机追踪 ──
   double _camX = 0, _camY = 0, _camZ = 0, _camYaw = 0, _camPitch = 0;
+  // 锚点（固定世界坐标系参考系），实现“固定在一个位置”
+  vec.Vector3? _anchorPos;
+  double _anchorYaw = 0;
+  double _anchorPitch = 0;
+  bool _anchorSet = false;
+
   static const _focusDistance = 1.5;
   static const _flowSpeed = 1.2;
   static const _windowPastSec = 2.5;
@@ -180,6 +186,15 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       _camYaw = angles.y;
       _camPitch = angles.x;
 
+      // 如果尚未设置锚点，则以当前相机位置和朝向作为固定的参考系
+      if (!_anchorSet) {
+        _anchorPos = vec.Vector3(_camX, _camY, _camZ);
+        _anchorYaw = _camYaw;
+        // 强制Pitch为0，保证参考系水平（垂直于重力），即“手机水平仪竖直的Y/XZ平面”
+        _anchorPitch = 0; 
+        _anchorSet = true;
+      }
+
       if (!wasReady) {
         _refreshNodes();
         return;
@@ -196,15 +211,18 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   /// 根据相机位姿 + 歌词时间，计算世界坐标
   vec.Vector3 _calcWorldPosition(double zLocal, int index) {
-    final cosPitch = math.cos(_camPitch);
-    final sinPitch = math.sin(_camPitch);
+    // 如果没有锚点，暂时返回零向量（理论上不应发生，因为调用前检查了_cameraReady）
+    if (!_anchorSet || _anchorPos == null) return vec.Vector3.zero();
+
+    // 使用锚点的朝向（忽略Pitch，保证水平），位置固定
+    // 这样歌词生成路径就是水平的（XZ平面），且垂直立在半空（Y轴方向）
     final forward = vec.Vector3(
-      -math.sin(_camYaw) * cosPitch,
-      sinPitch,
-      -math.cos(_camYaw) * cosPitch,
+      -math.sin(_anchorYaw),
+      0, // Y轴分量为0，保证水平
+      -math.cos(_anchorYaw),
     );
 
-    final base = vec.Vector3(_camX, _camY, _camZ) + forward * zLocal;
+    final base = _anchorPos! + forward * zLocal;
     final floatY = math.sin(_lastFrameTime * 0.8 + index) * _floatAmp;
     return vec.Vector3(base.x, base.y + _centerYOffset + floatY, base.z);
   }
@@ -301,7 +319,8 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       ),
       position: pos,
       scale: vec.Vector3.all(0.048),
-      eulerAngles: vec.Vector3(_camPitch, _camYaw, 0),
+      // 固定朝向：Pitch=0保证文字垂直竖立，Yaw=_anchorYaw保证正对初始视角
+      eulerAngles: vec.Vector3(0, _anchorYaw, 0),
     );
     _arkit?.add(node);
   }
@@ -356,7 +375,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
         node: ARKitNode(
           name: node.id,
           position: pos,
-          eulerAngles: vec.Vector3(_camPitch, _camYaw, 0),
+          eulerAngles: vec.Vector3(0, _anchorYaw, 0),
         ),
         materials: needsAlphaUpdate ? [_buildMaterial(alpha)] : null,
       );
