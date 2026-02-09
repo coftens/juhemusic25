@@ -381,8 +381,10 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       if (posChanged || needsAlphaUpdate) {
         _arkit?.update(
           node.id,
-          position: pos,
-          // ⚠️ 性能优化：不要在 update 中重新传入 geometry/node，只更新属性
+          node: ARKitNode(
+            position: pos,
+            eulerAngles: vec.Vector3(0, _anchorYaw, 0),
+          ),
           materials: needsAlphaUpdate ? [_buildMaterial(alpha)] : null,
         );
         node.position = pos;
