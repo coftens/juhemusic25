@@ -335,17 +335,17 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   // ─────────────────── 材质（发光 + 淡入淡出）───────────
 
   ARKitMaterial _buildMaterial(double opacity) {
-    final t = opacity.clamp(0.0, 1.0);
+    // 材质优化：Cyberpunk 风格
+    // 漫反射设为黑色，避免受环境光影响变成死白
+    // 主要靠自发光，lightingModelName设为 constant 更省性能且更像UI
     return ARKitMaterial(
-      // 白色漫反射，接受场景光照
-      diffuse: ARKitMaterialProperty.color(Colors.white),
-      // 青蓝色自发光（发光效果的关键！）
-      // ★ 必须使用 lambert/blinn，constant 模式会忽略 emission ★
-      emission: ARKitMaterialProperty.color(const Color(0xFF88FFFF)),
-      lightingModelName: ARKitLightingModel.lambert,
+      diffuse: ARKitMaterialProperty.color(Colors.black),
+      emission: ARKitMaterialProperty.color(
+        const Color(0xFF00FFFF).withOpacity(opacity)
+      ),
+      lightingModelName: ARKitLightingModel.constant,
       doubleSided: true,
-      // 整体透明度控制淡入淡出
-      transparency: t,
+      transparency: opacity,
     );
   }
 
@@ -376,19 +376,18 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       final pos = _calcWorldPosition(zLocal, index);
       final alpha = _alphaForZ(zLocal, index == _activeIndex);
       final needsAlphaUpdate = (alpha - node.lastAlpha).abs() > 0.04;
+      final posChanged = (node.position - pos).length > 0.005;
 
-      _arkit?.update(
-        node.id,
-        node: ARKitNode(
-          name: node.id,
+      if (posChanged || needsAlphaUpdate) {
+        _arkit?.update(
+          node.id,
           position: pos,
-          eulerAngles: vec.Vector3(0, _anchorYaw, 0),
-        ),
-        materials: needsAlphaUpdate ? [_buildMaterial(alpha)] : null,
-      );
-
-      node.position = pos;
-      if (needsAlphaUpdate) node.lastAlpha = alpha;
+          // ⚠️ 性能优化：不要在 update 中重新传入 geometry/node，只更新属性
+          materials: needsAlphaUpdate ? [_buildMaterial(alpha)] : null,
+        );
+        node.position = pos;
+        if (needsAlphaUpdate) node.lastAlpha = alpha;
+      }
     });
 
     for (final i in toRemove) {
@@ -434,6 +433,14 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     _nodes.clear();
   }
 
+  void _recenter() {
+    setState(() {
+      _anchorSet = false;
+      _removeAllNodes();
+    });
+    // 下一帧 _trackCamera 会自动重新设定锚点
+  }
+
   // ─────────────────── 构建 ─────────────────────────────
 
   @override
@@ -467,6 +474,12 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
                       style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.w700),
                     ),
+                  ),
+                  IconButton(
+                    onPressed: _recenter,
+                    icon: const Icon(Icons.center_focus_weak),
+                    color: Colors.white70,
+                    tooltip: '重置位置',
                   ),
                 ],
               ),
