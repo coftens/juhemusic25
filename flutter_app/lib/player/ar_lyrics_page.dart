@@ -29,15 +29,17 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   ARKitController? _arkit;
 
+  // ── 淡入淡出参数 ──
   static const _fadeStep = Duration(milliseconds: 80);
-  // 更多的淡入步数，让过渡更平滑
-  static const _fadeInSteps = [0.15, 0.32, 0.48, 0.62, 0.75, 0.85, 0.93, 1.0];
-  // 更多的淡出步数，让消失更自然
+  static const _fadeInSteps  = [0.15, 0.32, 0.48, 0.62, 0.75, 0.85, 0.93, 1.0];
   static const _fadeOutSteps = [0.9, 0.75, 0.58, 0.42, 0.28, 0.15, 0.06, 0.0];
 
+  // ── 订阅 & 定时器 ──
   StreamSubscription<Duration>? _posSub;
   Timer? _passTimer;
+  Timer? _cameraTimer;
 
+  // ── 歌曲 / 歌词状态 ──
   SearchItem? _item;
   String _lyricFor = '';
   List<_LyricLine> _lines = const [];
@@ -45,9 +47,17 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   bool _loading = true;
   String? _error;
 
+  // ── AR 场景节点 ──
   _ArLyricNode? _currentNode;
   _ArLyricNode? _nextNode;
   bool _currentClearedByPass = false;
+  final _fadingNodeIds = <String>{}; // 正在淡入淡出的节点，跳过重定位
+
+  // ── 相机追踪 ──
+  double _camX = 0, _camY = 0, _camZ = 0, _camYaw = 0;
+  bool _cameraReady = false;
+
+  // ─────────────────── 生命周期 ───────────────────────────
 
   @override
   void initState() {
@@ -58,7 +68,11 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     _svc.addListener(_onPlayerChanged);
     _posSub = _svc.positionStream.listen(_onPosition);
 
-    _passTimer = Timer.periodic(const Duration(milliseconds: 200), (_) => _checkPassThrough());
+    _passTimer = Timer.periodic(
+        const Duration(milliseconds: 250), (_) => _checkPassThrough());
+    // 每 120ms 轮询相机位置，实现歌词跟随相机左右居中 + 面向相机
+    _cameraTimer = Timer.periodic(
+        const Duration(milliseconds: 120), (_) => _trackCamera());
   }
 
   @override
@@ -66,10 +80,13 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     _svc.removeListener(_onPlayerChanged);
     _posSub?.cancel();
     _passTimer?.cancel();
+    _cameraTimer?.cancel();
     _removeAllNodes();
     _arkit?.dispose();
     super.dispose();
   }
+
+  // ─────────────────── 播放器 / 歌词 ─────────────────────
 
   void _onPlayerChanged() {
     final cur = _svc.current;
@@ -85,10 +102,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     final url = cur.shareUrl;
     if (url.isEmpty) return;
 
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+    setState(() { _loading = true; _error = null; });
 
     try {
       var raw = cur.lyrics;
@@ -109,34 +123,26 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       _lines = const [];
       _removeAllNodes();
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-      });
+      if (mounted) setState(() => _loading = false);
     }
   }
 
   void _onPosition(Duration pos) {
-    if (_lines.isEmpty) return;
-    if (_svc.isBuffering) return;
+    if (_lines.isEmpty || _svc.isBuffering) return;
 
     final q = _svc.quality;
-    final isHq = q.contains('flac') ||
-        q.contains('hires') ||
-        q.contains('master') ||
-        q.contains('atmos') ||
-        q.contains('sky') ||
-        q.contains('effect') ||
-        q.contains('320');
+    final isHq = q.contains('flac') || q.contains('hires') ||
+        q.contains('master') || q.contains('atmos') ||
+        q.contains('sky') || q.contains('effect') || q.contains('320');
     final offset = isHq ? 400 : 0;
 
     final ms = math.max(0, pos.inMilliseconds - offset);
     final idx = _findActiveIndex(_lines, ms);
     if (idx == _activeIndex) return;
 
-    // 立即移除不匹配的旧节点，避免切换时重叠
+    // 立即移除旧的当前节点
     if (_currentNode != null && _currentNode!.index != idx) {
-      _arkit?.remove(_currentNode!.id);
+      _safeRemove(_currentNode!.id);
       _currentNode = null;
     }
 
@@ -145,211 +151,253 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     _refreshNodes();
   }
 
-  void _onARKitViewCreated(ARKitController controller) {
-    _arkit = controller;
-    _refreshNodes();
+  // ─────────────────── AR 控制器 ──────────────────────────
+
+  void _onARKitViewCreated(ARKitController c) {
+    _arkit = c;
+    // 节点创建推迟到相机数据就绪后（_trackCamera 触发）
   }
 
-  void _refreshNodes() {
+  // ─────────────────── 相机追踪 ──────────────────────────
+
+  Future<void> _trackCamera() async {
     if (_arkit == null) return;
-    if (_lines.isEmpty) {
-      _fadeOutAllNodes();
-      return;
+    try {
+      final pos = await _arkit!.cameraPosition();
+      if (pos == null) return;
+      final angles = await _arkit!.getCameraEulerAngles();
+
+      final wasReady = _cameraReady;
+      _cameraReady = true;
+
+      final movedH = (pos.x - _camX).abs() + (pos.z - _camZ).abs();
+      final rotated = (angles.y - _camYaw).abs();
+
+      _camX = pos.x;
+      _camY = pos.y;
+      _camZ = pos.z;
+      _camYaw = angles.y;
+
+      if (!wasReady) {
+        // 首次获得相机数据 → 放置歌词
+        _refreshNodes();
+        return;
+      }
+      // 相机移动或旋转超过阈值时重定位歌词
+      if (movedH > 0.02 || rotated > 0.03) {
+        _repositionNodes();
+      }
+    } catch (_) {}
+  }
+
+  // ─────────────────── 坐标计算 ──────────────────────────
+
+  /// 根据当前相机位置 + 朝向，计算歌词在世界坐标中的位置
+  vec.Vector3 _calcWorldPosition(double distance, int index) {
+    final groundY = _groundY(index);
+    // 相机前方 = (-sin(yaw), 0, -cos(yaw))
+    final x = _camX - math.sin(_camYaw) * distance;
+    final z = _camZ - math.cos(_camYaw) * distance;
+    return vec.Vector3(x, groundY, z);
+  }
+
+  /// 地面高度：手机通常在地面上方 ~1.2m，歌词放在地面上
+  double _groundY(int index) {
+    final seed = (index * 12345) % 0x7FFFFFFF;
+    final r = math.Random(seed);
+    // 地面约在相机下方 1.15~1.30 米
+    return _camY - 1.15 - r.nextDouble() * 0.15;
+  }
+
+  // ─────────────────── 节点重定位 ────────────────────────
+
+  void _repositionNodes() {
+    if (_arkit == null) return;
+
+    // 重定位当前歌词（如果未被穿越清除且不在淡入淡出中）
+    if (!_currentClearedByPass && _currentNode != null &&
+        !_fadingNodeIds.contains(_currentNode!.id)) {
+      final n = _currentNode!;
+      _safeRemove(n.id);
+      final newPos = _calcWorldPosition(n.distance, n.index);
+      _addTextNodeAt(n.id, n.index, newPos, 1.0);
+      _currentNode = _ArLyricNode(
+          id: n.id, index: n.index, distance: n.distance, position: newPos);
     }
 
-    // 移除不匹配的节点（而不是全部移除）
+    // 重定位下一句歌词
+    if (_nextNode != null && !_fadingNodeIds.contains(_nextNode!.id)) {
+      final n = _nextNode!;
+      _safeRemove(n.id);
+      final newPos = _calcWorldPosition(n.distance, n.index);
+      _addTextNodeAt(n.id, n.index, newPos, 1.0);
+      _nextNode = _ArLyricNode(
+          id: n.id, index: n.index, distance: n.distance, position: newPos);
+    }
+  }
+
+  // ─────────────────── 节点管理 ──────────────────────────
+
+  void _refreshNodes() {
+    if (_arkit == null || !_cameraReady) return;
+    if (_lines.isEmpty) { _fadeOutAllNodes(); return; }
+
     if (_currentNode != null && _currentNode!.index != _activeIndex) {
-      _arkit?.remove(_currentNode!.id);
+      _safeRemove(_currentNode!.id);
       _currentNode = null;
     }
     if (_nextNode != null && _nextNode!.index != _activeIndex + 1) {
-      _arkit?.remove(_nextNode!.id);
+      _safeRemove(_nextNode!.id);
       _nextNode = null;
     }
 
     if (_activeIndex < 0 || _activeIndex >= _lines.length) return;
 
-    // 只创建缺失的节点
     if (!_currentClearedByPass && _currentNode == null) {
-      _currentNode = _addLineNode(index: _activeIndex, distance: 5.0);
+      _currentNode = _createNode(index: _activeIndex, distance: 5.0);
     }
-
     if (_nextNode == null && _activeIndex + 1 < _lines.length) {
-      _nextNode = _addLineNode(index: _activeIndex + 1, distance: 10.0);
+      _nextNode = _createNode(index: _activeIndex + 1, distance: 10.0);
     }
   }
 
-  _ArLyricNode? _addLineNode({required int index, required double distance}) {
+  _ArLyricNode? _createNode({required int index, required double distance}) {
     if (_arkit == null) return null;
-
     final text = _lines[index].text;
     if (text.trim().isEmpty) return null;
 
-    final position = _positionInFrontOfCamera(distance, index);
-    final nodeName = 'lyric_${index}_${distance.toStringAsFixed(1)}';
-    _addTextNodeAt(nodeName, index, position, _fadeInSteps.first);
-    _fadeInNode(nodeName, index, position);
+    final pos = _calcWorldPosition(distance, index);
+    final id = 'lyric_${index}_${distance.toStringAsFixed(0)}';
+    _addTextNodeAt(id, index, pos, _fadeInSteps.first);
+    _fadeInNode(id, index, distance);
 
-    return _ArLyricNode(
-      id: nodeName,
-      index: index,
-      position: position,
-    );
+    return _ArLyricNode(id: id, index: index, distance: distance, position: pos);
   }
 
-  void _addTextNodeAt(String nodeName, int index, vec.Vector3 position, double opacity) {
-    if (_arkit == null) return;
-    if (index < 0 || index >= _lines.length) return;
-
+  void _addTextNodeAt(String name, int index, vec.Vector3 pos, double opacity) {
+    if (_arkit == null || index < 0 || index >= _lines.length) return;
     final text = _lines[index].text;
     if (text.trim().isEmpty) return;
 
-    final material = _buildMaterial(opacity);
-    final geometry = ARKitText(
-      text: text,
-      extrusionDepth: 0.08, // 增加到0.08，字体更厚重、发光面更大
-      materials: [material],
-    );
-
     final node = ARKitNode(
-      name: nodeName,
-      geometry: geometry,
-      position: position,
-      scale: vec.Vector3.all(0.048), // 进一步增大到0.048，接近参考视频的字体大小
+      name: name,
+      geometry: ARKitText(
+        text: text,
+        extrusionDepth: 0.08,
+        materials: [_buildMaterial(opacity)],
+      ),
+      position: pos,
+      scale: vec.Vector3.all(0.048),
+      // 面向相机（billboard 效果）：Y 轴旋转 = 相机 yaw
+      eulerAngles: vec.Vector3(0, _camYaw, 0),
     );
-
     _arkit?.add(node);
   }
 
+  // ─────────────────── 材质（发光 + 淡入淡出）───────────
+
   ARKitMaterial _buildMaterial(double opacity) {
-    final clamped = opacity.clamp(0.0, 1.0);
-    // 发光强度：透明到完全发光的渐进
-    final glowIntensity = math.min(1.2, clamped + 0.75);
-    
-    // 漫反射：白色为主，透明度随opacity变化
-    final diffuseColor = Colors.white.withOpacity(clamped);
-    
-    // 发光颜色：混合白色和青蓝色，在高opacity时更偏青蓝
-    final emissionBaseColor = Color.lerp(
-      const Color(0xFF88FFFF), // 浅青
-      const Color(0xFFFFFFFF), // 白色
-      (1.0 - clamped).clamp(0.0, 1.0),
-    ) ?? const Color(0xFFFFFFFF);
-    
+    final t = opacity.clamp(0.0, 1.0);
     return ARKitMaterial(
-      diffuse: ARKitMaterialProperty.color(diffuseColor),
-      // 强化发光效果：颜色 + 强度都增加
-      emission: ARKitMaterialProperty.color(
-        emissionBaseColor.withOpacity(glowIntensity),
-      ),
-      lightingModelName: ARKitLightingModel.constant,
+      // 白色漫反射，接受场景光照
+      diffuse: ARKitMaterialProperty.color(Colors.white),
+      // 青蓝色自发光（发光效果的关键！）
+      // ★ 必须使用 lambert/blinn，constant 模式会忽略 emission ★
+      emission: ARKitMaterialProperty.color(const Color(0xFF88FFFF)),
+      lightingModelName: ARKitLightingModel.lambert,
+      doubleSided: true,
+      // 整体透明度控制淡入淡出
+      transparency: t,
     );
   }
 
-  bool _isNodeActive(String nodeId) {
-    return _currentNode?.id == nodeId || _nextNode?.id == nodeId;
-  }
+  // ─────────────────── 淡入淡出动画 ─────────────────────
 
-  Future<void> _fadeInNode(String nodeName, int index, vec.Vector3 position) async {
+  Future<void> _fadeInNode(String id, int index, double distance) async {
+    _fadingNodeIds.add(id);
     for (final opacity in _fadeInSteps) {
-      if (!mounted || _arkit == null) return;
-      if (!_isNodeActive(nodeName)) return;
-      _arkit?.remove(nodeName);
-      _addTextNodeAt(nodeName, index, position, opacity);
-      await Future.delayed(_fadeStep);
-    }
-  }
-
-  Future<void> _fadeOutNode(_ArLyricNode node) async {
-    for (final opacity in _fadeOutSteps) {
       if (!mounted || _arkit == null) break;
-      try {
-        _arkit?.remove(node.id);
-        if (opacity > 0) {
-          _addTextNodeAt(node.id, node.index, node.position, opacity);
-        }
-      } catch (_) {
-        // 节点可能已被移除，忽略异常
+      if (!_isNodeActive(id)) break;
+      _safeRemove(id);
+      // 每帧使用最新相机位置，保证淡入过程中歌词跟随
+      final pos = _calcWorldPosition(distance, index);
+      _addTextNodeAt(id, index, pos, opacity);
+      // 更新存储的位置
+      if (_currentNode?.id == id) {
+        _currentNode = _ArLyricNode(
+            id: id, index: index, distance: distance, position: pos);
+      } else if (_nextNode?.id == id) {
+        _nextNode = _ArLyricNode(
+            id: id, index: index, distance: distance, position: pos);
       }
       await Future.delayed(_fadeStep);
     }
+    _fadingNodeIds.remove(id);
   }
 
-  double _getHeightForIndex(int index) {
-    // 使用索引生成伪随机高度，保证同一句歌词位置一致
-    final seed = (index * 12345) % 0x7FFFFFFF;
-    final random = math.Random(seed);
-    return -0.15 + random.nextDouble() * 0.25; // 范围: -0.15 ~ 0.1，"立在地面上"
+  Future<void> _fadeOutNode(_ArLyricNode node) async {
+    _fadingNodeIds.add(node.id);
+    for (final opacity in _fadeOutSteps) {
+      if (!mounted || _arkit == null) break;
+      try {
+        _safeRemove(node.id);
+        if (opacity > 0) {
+          _addTextNodeAt(node.id, node.index, node.position, opacity);
+        }
+      } catch (_) {}
+      await Future.delayed(_fadeStep);
+    }
+    _fadingNodeIds.remove(node.id);
   }
 
-  vec.Vector3 _positionInFrontOfCamera(double distance, int index) {
-    final height = _getHeightForIndex(index);
-    // 直接返回相对于摄像头的位置（ARKit会自动处理相对坐标）
-    return vec.Vector3(0, height, -distance);
-  }
+  bool _isNodeActive(String id) =>
+      _currentNode?.id == id || _nextNode?.id == id;
 
-  vec.Vector3? _cameraPosition() {
-    // arkit_plugin 1.3.0 不支持直接获取相机位置
-    // 假设摄像头始终在原点，并使用相对坐标
-    return vec.Vector3.zero();
-  }
+  // ─────────────────── 穿越检测 ──────────────────────────
 
   void _checkPassThrough() {
-    if (_arkit == null) return;
-    if (_currentNode == null) return;
+    if (_arkit == null || !_cameraReady || _currentNode == null) return;
     if (_activeIndex < _currentNode!.index) return;
 
-    final camPos = _cameraPosition();
-    if (camPos == null) return;
-
-    // 相机和歌词节点的Y轴距离
-    final distY = (camPos.y - _currentNode!.position.y).abs();
-    // 相机和歌词节点的XZ平面距离
-    final distXZ = math.sqrt(
-      (_currentNode!.position.x * _currentNode!.position.x) +
-      (_currentNode!.position.z * _currentNode!.position.z),
-    );
-    // 综合距离（当相机接近5m处的歌词时触发）
-    final totalDist = math.sqrt(distY * distY + distXZ * distXZ);
-    if (totalDist > 0.7) return;
+    final n = _currentNode!;
+    final dx = _camX - n.position.x;
+    final dy = _camY - n.position.y;
+    final dz = _camZ - n.position.z;
+    final dist = math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (dist > 2.0) return; // 2m 内触发穿越
 
     final fading = _currentNode;
     _currentNode = null;
     _currentClearedByPass = true;
     if (fading != null) {
-      // 延时2秒后再销毁，保留穿过效果
       Future.delayed(const Duration(seconds: 2), () {
-        if (mounted && _arkit != null) {
-          _fadeOutNode(fading);
-        }
+        if (mounted && _arkit != null) _fadeOutNode(fading);
       });
     }
   }
 
-  void _removeNode(_ArLyricNode? node) {
-    if (node == null) return;
-    _arkit?.remove(node.id);
+  // ─────────────────── 清理 ─────────────────────────────
+
+  void _safeRemove(String name) {
+    try { _arkit?.remove(name); } catch (_) {}
   }
 
   void _removeAllNodes() {
-    _removeNode(_currentNode);
-    _removeNode(_nextNode);
+    if (_currentNode != null) _safeRemove(_currentNode!.id);
+    if (_nextNode != null) _safeRemove(_nextNode!.id);
     _currentNode = null;
     _nextNode = null;
   }
 
   void _fadeOutAllNodes() {
-    final current = _currentNode;
-    final next = _nextNode;
+    final c = _currentNode, n = _nextNode;
     _currentNode = null;
     _nextNode = null;
-    if (current != null) {
-      _fadeOutNode(current);
-    }
-    if (next != null) {
-      _fadeOutNode(next);
-    }
+    if (c != null) _fadeOutNode(c);
+    if (n != null) _fadeOutNode(n);
   }
+
+  // ─────────────────── 构建 ─────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -360,6 +408,8 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
         children: [
           ARKitSceneView(
             onARKitViewCreated: _onARKitViewCreated,
+            // 开启水平面检测，辅助 AR 追踪精度
+            planeDetection: ARPlaneDetection.horizontal,
           ),
           SafeArea(
             child: Padding(
@@ -377,7 +427,8 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
                       _item?.name ?? 'AR歌词',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
@@ -390,9 +441,9 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
               child: Padding(
                 padding: EdgeInsets.only(bottom: 24),
                 child: SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70),
+                  width: 22, height: 22,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white70),
                 ),
               ),
             ),
@@ -401,10 +452,9 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 24),
-                child: Text(
-                  _error!,
-                  style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600),
-                ),
+                child: Text(_error!,
+                    style: const TextStyle(
+                        color: Colors.redAccent, fontWeight: FontWeight.w600)),
               ),
             ),
         ],
@@ -413,24 +463,29 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   }
 }
 
+// ───────────────────── 数据模型 ─────────────────────────
+
 class _ArLyricNode {
   const _ArLyricNode({
     required this.id,
     required this.index,
+    required this.distance,
     required this.position,
   });
 
   final String id;
   final int index;
+  final double distance; // 距相机的距离（5.0 或 10.0）
   final vec.Vector3 position;
 }
 
 class _LyricLine {
   const _LyricLine(this.ms, this.text);
-
   final int ms;
   final String text;
 }
+
+// ───────────────────── LRC 解析 ─────────────────────────
 
 final _timeRe = RegExp(r'\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]');
 
@@ -453,8 +508,7 @@ List<_LyricLine> _parseLrc(String input) {
               : frac.length == 2
                   ? int.parse(frac) * 10
                   : int.parse(frac.padRight(3, '0').substring(0, 3));
-      final t = (mm * 60 + ss) * 1000 + ms;
-      lines.add(_LyricLine(t, text));
+      lines.add(_LyricLine((mm * 60 + ss) * 1000 + ms, text));
     }
   }
   lines.sort((a, b) => a.ms.compareTo(b.ms));
@@ -462,18 +516,10 @@ List<_LyricLine> _parseLrc(String input) {
 }
 
 int _findActiveIndex(List<_LyricLine> lines, int ms) {
-  var lo = 0;
-  var hi = lines.length - 1;
-  var ans = 0;
+  var lo = 0, hi = lines.length - 1, ans = 0;
   while (lo <= hi) {
     final mid = (lo + hi) >> 1;
-    final t = lines[mid].ms;
-    if (t <= ms) {
-      ans = mid;
-      lo = mid + 1;
-    } else {
-      hi = mid - 1;
-    }
+    if (lines[mid].ms <= ms) { ans = mid; lo = mid + 1; } else { hi = mid - 1; }
   }
   return ans;
 }
