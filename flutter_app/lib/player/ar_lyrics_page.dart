@@ -57,8 +57,8 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   double _camX = 0, _camY = 0, _camZ = 0, _camYaw = 0, _camPitch = 0;
   // 锚点（固定世界坐标系参考系），实现“固定在一个位置”
   vec.Vector3? _anchorPos;
+  vec.Vector3? _anchorForward; // 记录初始时刻的正前方向量
   double _anchorYaw = 0;
-  double _anchorPitch = 0;
   bool _anchorSet = false;
 
   static const _focusDistance = 1.5;
@@ -190,8 +190,21 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       if (!_anchorSet) {
         _anchorPos = vec.Vector3(_camX, _camY, _camZ);
         _anchorYaw = _camYaw;
-        // 强制Pitch为0，保证参考系水平（垂直于重力），即“手机水平仪竖直的Y/XZ平面”
-        _anchorPitch = 0; 
+        
+        // 计算并锁定初始时刻的正前方向量（包含Pitch偏角），确保隧道正对镜头中心
+        final cosPitch = math.cos(_camPitch);
+        final sinPitch = math.sin(_camPitch);
+        final cosYaw = math.cos(_camYaw);
+        final sinYaw = math.sin(_camYaw);
+        
+        // ARKit坐标系通常：Y向上，-Z向前（屏幕朝向）。需要根据Pitch和Yaw计算世界坐标系下的前向矢量。
+        // 使用标准旋转公式确保“正前方”真的是镜头的正前方
+        _anchorForward = vec.Vector3(
+          -sinYaw * cosPitch,
+          sinPitch,
+          -cosYaw * cosPitch,
+        ).normalized();
+
         _anchorSet = true;
       }
 
@@ -211,18 +224,15 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   /// 根据相机位姿 + 歌词时间，计算世界坐标
   vec.Vector3 _calcWorldPosition(double zLocal, int index) {
-    // 如果没有锚点，暂时返回零向量（理论上不应发生，因为调用前检查了_cameraReady）
-    if (!_anchorSet || _anchorPos == null) return vec.Vector3.zero();
+    // 如果没有锚点，暂时返回零向量
+    if (!_anchorSet || _anchorPos == null || _anchorForward == null) {
+      return vec.Vector3.zero();
+    }
 
-    // 使用锚点的朝向（忽略Pitch，保证水平），位置固定
-    // 这样歌词生成路径就是水平的（XZ平面），且垂直立在半空（Y轴方向）
-    final forward = vec.Vector3(
-      -math.sin(_anchorYaw),
-      0, // Y轴分量为0，保证水平
-      -math.cos(_anchorYaw),
-    );
-
-    final base = _anchorPos! + forward * zLocal;
+    // 根据初始锁定的正方向和位置延伸，确保歌词隧道位于镜头正中心
+    final base = _anchorPos! + _anchorForward! * zLocal;
+    
+    // 稍微调整Y轴偏移（可选），让文字看起来更自然地悬浮
     final floatY = math.sin(_lastFrameTime * 0.8 + index) * _floatAmp;
     return vec.Vector3(base.x, base.y + _centerYOffset + floatY, base.z);
   }
@@ -375,7 +385,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
         node: ARKitNode(
           name: node.id,
           position: pos,
-          eulerAngles: vec.Vector3(0, _anchorYaw, 0),
+          eulerAngles: vec.Vector3(_anchorPitch, _anchorYaw, 0),
         ),
         materials: needsAlphaUpdate ? [_buildMaterial(alpha)] : null,
       );
