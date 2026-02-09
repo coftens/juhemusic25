@@ -56,10 +56,10 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   // ── 相机追踪 ──
   double _camX = 0, _camY = 0, _camZ = 0, _camYaw = 0, _camPitch = 0;
   // 锚点（固定世界坐标系参考系），实现“固定在一个位置”
-  vec.Vector3? _anchorPos;
-  vec.Vector3? _anchorForward; // 记录初始时刻的正前方向量
-  double _anchorYaw = 0;
   bool _anchorSet = false;
+  vec.Vector3? _anchorPos;
+  vec.Vector3? _anchorForward; // 初始视线方向
+  double _anchorYaw = 0; // 初始偏航角（用于文字朝向）
 
   static const _focusDistance = 1.5;
   static const _flowSpeed = 1.2;
@@ -191,20 +191,17 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
         _anchorPos = vec.Vector3(_camX, _camY, _camZ);
         _anchorYaw = _camYaw;
         
-        // 计算并锁定初始时刻的正前方向量（包含Pitch偏角），确保隧道正对镜头中心
-        final cosPitch = math.cos(_camPitch);
-        final sinPitch = math.sin(_camPitch);
-        final cosYaw = math.cos(_camYaw);
-        final sinYaw = math.sin(_camYaw);
+        // 使用矩阵计算精确的前向向量，避免手动三角函数的坐标系混淆
+        // 顺序：Yaw(Y) -> Pitch(X) -> Roll(Z) 是常见的相机旋转顺序
+        final mat = vec.Matrix4.identity()
+          ..rotateY(angles.y)
+          ..rotateX(angles.x)
+          ..rotateZ(angles.z);
+          
+        // 本地坐标系中，前向通常是 -Z (0, 0, -1)
+        final localForward = vec.Vector3(0, 0, -1);
+        _anchorForward = mat.transformed3(localForward).normalized();
         
-        // ARKit坐标系通常：Y向上，-Z向前（屏幕朝向）。需要根据Pitch和Yaw计算世界坐标系下的前向矢量。
-        // 使用标准旋转公式确保“正前方”真的是镜头的正前方
-        _anchorForward = vec.Vector3(
-          -sinYaw * cosPitch,
-          sinPitch,
-          -cosYaw * cosPitch,
-        ).normalized();
-
         _anchorSet = true;
       }
 
