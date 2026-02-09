@@ -36,9 +36,10 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   // ── 订阅 & 定时器 ──
   StreamSubscription<Duration>? _posSub;
-  Timer? _passTimer;
   double _lastFrameTime = 0;
   bool _trackingInFlight = false;
+  int _lastPosMs = 0;
+  DateTime? _lastPosUpdatedAt;
 
   // ── 歌曲 / 歌词状态 ──
   SearchItem? _item;
@@ -49,14 +50,19 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   String? _error;
 
   // ── AR 场景节点 ──
-  _ArLyricNode? _currentNode;
-  _ArLyricNode? _nextNode;
-  bool _currentClearedByPass = false;
-  final _fadingNodeIds = <String>{}; // 正在淡入淡出的节点，跳过重定位
-  final Map<String, double> _lastForwardDist = {};
+  final Map<int, _ArLyricNode> _nodes = {};
+  final _fadingNodeIds = <String>{}; // 正在淡入淡出的节点，跳过更新
 
   // ── 相机追踪 ──
-  double _camX = 0, _camY = 0, _camZ = 0, _camYaw = 0;
+  double _camX = 0, _camY = 0, _camZ = 0, _camYaw = 0, _camPitch = 0;
+  static const _focusDistance = 1.5;
+  static const _flowSpeed = 1.2;
+  static const _windowPastSec = 2.5;
+  static const _windowFutureSec = 10.0;
+  static const _farFadeStart = 6.0;
+  static const _farFadeEnd = 14.0;
+  static const _passZTrigger = 0.08;
+  static const _floatAmp = 0.03;
   bool _cameraReady = false;
 
   // ─────────────────── 生命周期 ───────────────────────────
@@ -69,16 +75,12 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
     _svc.addListener(_onPlayerChanged);
     _posSub = _svc.positionStream.listen(_onPosition);
-
-    _passTimer = Timer.periodic(
-      const Duration(milliseconds: 200), (_) => _checkPassThrough());
   }
 
   @override
   void dispose() {
     _svc.removeListener(_onPlayerChanged);
     _posSub?.cancel();
-    _passTimer?.cancel();
     _removeAllNodes();
     _arkit?.dispose();
     super.dispose();
@@ -113,7 +115,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       _lyricFor = url;
       _lines = lines;
       _activeIndex = 0;
-      _currentClearedByPass = false;
+      _nodes.clear();
       _refreshNodes();
     } catch (e) {
       if (!mounted) return;
@@ -135,17 +137,13 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     final offset = isHq ? 400 : 0;
 
     final ms = math.max(0, pos.inMilliseconds - offset);
+    _lastPosMs = ms;
+    _lastPosUpdatedAt = DateTime.now();
+
     final idx = _findActiveIndex(_lines, ms);
-    if (idx == _activeIndex) return;
-
-    // 立即移除旧的当前节点
-    if (_currentNode != null && _currentNode!.index != idx) {
-      _safeRemove(_currentNode!.id);
-      _currentNode = null;
+    if (idx != _activeIndex) {
+      _activeIndex = idx;
     }
-
-    _activeIndex = idx;
-    _currentClearedByPass = false;
     _refreshNodes();
   }
 
@@ -179,12 +177,13 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       _camY = pos.y;
       _camZ = pos.z;
       _camYaw = angles.y;
+      _camPitch = angles.x;
 
       if (!wasReady) {
         _refreshNodes();
         return;
       }
-      _repositionNodes();
+      _updateNodesForTime();
     } catch (_) {
       // 忽略相机读取失败
     } finally {
@@ -194,67 +193,44 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   // ─────────────────── 坐标计算 ──────────────────────────
 
-  /// 根据当前相机位置 + 朝向，计算歌词在世界坐标中的位置
-  vec.Vector3 _calcWorldPosition(double distance, int index) {
-    final groundY = _groundY(index);
-    // 相机前方 = (-sin(yaw), 0, -cos(yaw))
-    final x = _camX - math.sin(_camYaw) * distance;
-    final z = _camZ - math.cos(_camYaw) * distance;
-    return vec.Vector3(x, groundY, z);
-  }
-
-  /// 地面高度：手机通常在地面上方 ~1.2m，歌词放在地面上
-  double _groundY(int index) {
-    final seed = (index * 12345) % 0x7FFFFFFF;
-    final r = math.Random(seed);
-    // 地面约在相机下方 1.15~1.30 米
-    return _camY - 1.15 - r.nextDouble() * 0.15;
-  }
-
-  // ─────────────────── 节点重定位 ────────────────────────
-
-  void _repositionNodes() {
-    if (_arkit == null) return;
-
-    // 重定位当前歌词（如果未被穿越清除且不在淡入淡出中）
-    if (!_currentClearedByPass && _currentNode != null &&
-        !_fadingNodeIds.contains(_currentNode!.id)) {
-      final n = _currentNode!;
-      final newPos = _calcWorldPosition(n.distance, n.index);
-      _updateNodeTransform(n.id, newPos);
-      _currentNode = _ArLyricNode(
-          id: n.id, index: n.index, distance: n.distance, position: newPos);
-      _updateForwardDistance(n.id, newPos);
-    }
-
-    // 重定位下一句歌词
-    if (_nextNode != null && !_fadingNodeIds.contains(_nextNode!.id)) {
-      final n = _nextNode!;
-      final newPos = _calcWorldPosition(n.distance, n.index);
-      _updateNodeTransform(n.id, newPos);
-      _nextNode = _ArLyricNode(
-          id: n.id, index: n.index, distance: n.distance, position: newPos);
-      _updateForwardDistance(n.id, newPos);
-    }
-  }
-
-  void _updateNodeTransform(String id, vec.Vector3 pos) {
-    _arkit?.update(
-      id,
-      node: ARKitNode(
-        name: id,
-        position: pos,
-        eulerAngles: vec.Vector3(0, _camYaw, 0),
-      ),
+  /// 根据相机位姿 + 歌词时间，计算世界坐标
+  vec.Vector3 _calcWorldPosition(double zLocal, int index) {
+    final cosPitch = math.cos(_camPitch);
+    final sinPitch = math.sin(_camPitch);
+    final forward = vec.Vector3(
+      -math.sin(_camYaw) * cosPitch,
+      sinPitch,
+      -math.cos(_camYaw) * cosPitch,
     );
+
+    final floatY = math.sin(_lastFrameTime * 0.8 + index) * _floatAmp;
+    final base = vec.Vector3(_camX, _camY, _camZ) + forward * zLocal;
+    return vec.Vector3(base.x, base.y + floatY, base.z);
   }
 
-  void _updateForwardDistance(String id, vec.Vector3 pos) {
-    final forwardX = -math.sin(_camYaw);
-    final forwardZ = -math.cos(_camYaw);
-    final dx = pos.x - _camX;
-    final dz = pos.z - _camZ;
-    _lastForwardDist[id] = dx * forwardX + dz * forwardZ;
+  int _currentSongMs() {
+    if (_lastPosUpdatedAt == null) return _lastPosMs;
+    final drift = DateTime.now().difference(_lastPosUpdatedAt!).inMilliseconds;
+    return _lastPosMs + drift;
+  }
+
+  double _zForLine(int index, int currentMs) {
+    final dt = (_lines[index].ms - currentMs) / 1000.0;
+    return _focusDistance + dt * _flowSpeed;
+  }
+
+  double _alphaForZ(double zLocal, bool isCurrent) {
+    var alpha = 1.0;
+    if (zLocal <= _passZTrigger) {
+      alpha = (zLocal / _passZTrigger).clamp(0.0, 1.0);
+    } else if (zLocal > _farFadeStart) {
+      alpha = (1.0 - (zLocal - _farFadeStart) / (_farFadeEnd - _farFadeStart))
+          .clamp(0.0, 1.0);
+    }
+    if (isCurrent) {
+      alpha = math.min(1.0, alpha + 0.12);
+    }
+    return alpha;
   }
 
   // ─────────────────── 节点管理 ──────────────────────────
@@ -262,38 +238,52 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   void _refreshNodes() {
     if (_arkit == null || !_cameraReady) return;
     if (_lines.isEmpty) { _fadeOutAllNodes(); return; }
-
-    if (_currentNode != null && _currentNode!.index != _activeIndex) {
-      _safeRemove(_currentNode!.id);
-      _currentNode = null;
-    }
-    if (_nextNode != null && _nextNode!.index != _activeIndex + 1) {
-      _safeRemove(_nextNode!.id);
-      _nextNode = null;
-    }
-
-    if (_activeIndex < 0 || _activeIndex >= _lines.length) return;
-
-    if (!_currentClearedByPass && _currentNode == null) {
-      _currentNode = _createNode(index: _activeIndex, distance: 5.0);
-    }
-    if (_nextNode == null && _activeIndex + 1 < _lines.length) {
-      _nextNode = _createNode(index: _activeIndex + 1, distance: 10.0);
-    }
+    _syncVisibleNodes();
   }
 
-  _ArLyricNode? _createNode({required int index, required double distance}) {
-    if (_arkit == null) return null;
-    final text = _lines[index].text;
-    if (text.trim().isEmpty) return null;
+  void _syncVisibleNodes() {
+    if (_arkit == null || !_cameraReady) return;
+    if (_lines.isEmpty) return;
 
-    final pos = _calcWorldPosition(distance, index);
-    final id = 'lyric_${index}_${distance.toStringAsFixed(0)}';
-    _addTextNodeAt(id, index, pos, _fadeInSteps.first);
-    _fadeInNode(id, index, distance);
-    _updateForwardDistance(id, pos);
+    final currentMs = _currentSongMs();
+    final minMs = currentMs - (_windowPastSec * 1000).round();
+    final maxMs = currentMs + (_windowFutureSec * 1000).round();
 
-    return _ArLyricNode(id: id, index: index, distance: distance, position: pos);
+    var start = _activeIndex;
+    while (start > 0 && _lines[start - 1].ms >= minMs) {
+      start--;
+    }
+    var end = _activeIndex;
+    while (end + 1 < _lines.length && _lines[end + 1].ms <= maxMs) {
+      end++;
+    }
+
+    final toRemove = <int>[];
+    for (final i in _nodes.keys) {
+      if (i < start || i > end) toRemove.add(i);
+    }
+    for (final i in toRemove) {
+      _safeRemove(_nodes[i]!.id);
+      _nodes.remove(i);
+    }
+
+    for (var i = start; i <= end; i++) {
+      if (_nodes.containsKey(i)) continue;
+      final text = _lines[i].text;
+      if (text.trim().isEmpty) continue;
+      final zLocal = _zForLine(i, currentMs);
+      final pos = _calcWorldPosition(zLocal, i);
+      final alpha = _alphaForZ(zLocal, i == _activeIndex);
+      final id = 'lyric_${i}_${_lines[i].ms}';
+      _addTextNodeAt(id, i, pos, alpha);
+      _nodes[i] = _ArLyricNode(
+        id: id,
+        index: i,
+        position: pos,
+        lastAlpha: alpha,
+        passThroughTriggered: false,
+      );
+    }
   }
 
   void _addTextNodeAt(String name, int index, vec.Vector3 pos, double opacity) {
@@ -310,8 +300,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       ),
       position: pos,
       scale: vec.Vector3.all(0.048),
-      // 面向相机（billboard 效果）：Y 轴旋转 = 相机 yaw
-      eulerAngles: vec.Vector3(0, _camYaw, 0),
+      eulerAngles: vec.Vector3(_camPitch, _camYaw, 0),
     );
     _arkit?.add(node);
   }
@@ -333,28 +322,52 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     );
   }
 
-  // ─────────────────── 淡入淡出动画 ─────────────────────
+  // ─────────────────── 节点更新（时间-空间映射）──────────
 
-  Future<void> _fadeInNode(String id, int index, double distance) async {
-    _fadingNodeIds.add(id);
-    for (final opacity in _fadeInSteps) {
-      if (!mounted || _arkit == null) break;
-      if (!_isNodeActive(id)) break;
-      _safeRemove(id);
-      // 每帧使用最新相机位置，保证淡入过程中歌词跟随
-      final pos = _calcWorldPosition(distance, index);
-      _addTextNodeAt(id, index, pos, opacity);
-      // 更新存储的位置
-      if (_currentNode?.id == id) {
-        _currentNode = _ArLyricNode(
-            id: id, index: index, distance: distance, position: pos);
-      } else if (_nextNode?.id == id) {
-        _nextNode = _ArLyricNode(
-            id: id, index: index, distance: distance, position: pos);
+  void _updateNodesForTime() {
+    if (_arkit == null || !_cameraReady || _lines.isEmpty) return;
+
+    final currentMs = _currentSongMs();
+    _syncVisibleNodes();
+
+    final toRemove = <int>[];
+    _nodes.forEach((index, node) {
+      if (_fadingNodeIds.contains(node.id)) return;
+
+      final zLocal = _zForLine(index, currentMs);
+      if (zLocal < -0.4) {
+        toRemove.add(index);
+        return;
       }
-      await Future.delayed(_fadeStep);
+
+      if (!node.passThroughTriggered && zLocal <= _passZTrigger) {
+        node.passThroughTriggered = true;
+        _fadeOutNode(node);
+        return;
+      }
+
+      final pos = _calcWorldPosition(zLocal, index);
+      final alpha = _alphaForZ(zLocal, index == _activeIndex);
+      final needsAlphaUpdate = (alpha - node.lastAlpha).abs() > 0.04;
+
+      _arkit?.update(
+        node.id,
+        node: ARKitNode(
+          name: node.id,
+          position: pos,
+          eulerAngles: vec.Vector3(_camPitch, _camYaw, 0),
+        ),
+        materials: needsAlphaUpdate ? [_buildMaterial(alpha)] : null,
+      );
+
+      node.position = pos;
+      if (needsAlphaUpdate) node.lastAlpha = alpha;
+    });
+
+    for (final i in toRemove) {
+      _safeRemove(_nodes[i]!.id);
+      _nodes.remove(i);
     }
-    _fadingNodeIds.remove(id);
   }
 
   Future<void> _fadeOutNode(_ArLyricNode node) async {
@@ -362,51 +375,16 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     for (final opacity in _fadeOutSteps) {
       if (!mounted || _arkit == null) break;
       try {
-        _safeRemove(node.id);
-        if (opacity > 0) {
-          _addTextNodeAt(node.id, node.index, node.position, opacity);
-        }
+        _arkit?.update(
+          node.id,
+          materials: [_buildMaterial(opacity)],
+        );
       } catch (_) {}
       await Future.delayed(_fadeStep);
     }
+    _safeRemove(node.id);
+    _nodes.remove(node.index);
     _fadingNodeIds.remove(node.id);
-  }
-
-  bool _isNodeActive(String id) =>
-      _currentNode?.id == id || _nextNode?.id == id;
-
-  // ─────────────────── 穿越检测 ──────────────────────────
-
-  void _checkPassThrough() {
-    if (_arkit == null || !_cameraReady || _currentNode == null) return;
-    if (_activeIndex < _currentNode!.index) return;
-
-    final n = _currentNode!;
-    final forwardX = -math.sin(_camYaw);
-    final forwardZ = -math.cos(_camYaw);
-    final dx = n.position.x - _camX;
-    final dy = n.position.y - _camY;
-    final dz = n.position.z - _camZ;
-    final forwardDist = dx * forwardX + dz * forwardZ;
-    final lateralDist = (dx * -forwardZ + dz * forwardX).abs();
-    final lastForward = _lastForwardDist[n.id] ?? 999;
-
-    if (lateralDist > 0.8 || dy.abs() > 1.2) return;
-    if (lastForward > 0.4 && forwardDist <= 0.05) {
-      _lastForwardDist[n.id] = forwardDist;
-    } else {
-      _lastForwardDist[n.id] = forwardDist;
-      return;
-    }
-
-    final fading = _currentNode;
-    _currentNode = null;
-    _currentClearedByPass = true;
-    if (fading != null) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted && _arkit != null) _fadeOutNode(fading);
-      });
-    }
   }
 
   // ─────────────────── 清理 ─────────────────────────────
@@ -416,18 +394,17 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   }
 
   void _removeAllNodes() {
-    if (_currentNode != null) _safeRemove(_currentNode!.id);
-    if (_nextNode != null) _safeRemove(_nextNode!.id);
-    _currentNode = null;
-    _nextNode = null;
+    for (final node in _nodes.values) {
+      _safeRemove(node.id);
+    }
+    _nodes.clear();
   }
 
   void _fadeOutAllNodes() {
-    final c = _currentNode, n = _nextNode;
-    _currentNode = null;
-    _nextNode = null;
-    if (c != null) _fadeOutNode(c);
-    if (n != null) _fadeOutNode(n);
+    for (final node in _nodes.values) {
+      _fadeOutNode(node);
+    }
+    _nodes.clear();
   }
 
   // ─────────────────── 构建 ─────────────────────────────
@@ -499,17 +476,19 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 // ───────────────────── 数据模型 ─────────────────────────
 
 class _ArLyricNode {
-  const _ArLyricNode({
+  _ArLyricNode({
     required this.id,
     required this.index,
-    required this.distance,
     required this.position,
+    required this.lastAlpha,
+    required this.passThroughTriggered,
   });
 
   final String id;
   final int index;
-  final double distance; // 距相机的距离（5.0 或 10.0）
-  final vec.Vector3 position;
+  vec.Vector3 position;
+  double lastAlpha;
+  bool passThroughTriggered;
 }
 
 class _LyricLine {
