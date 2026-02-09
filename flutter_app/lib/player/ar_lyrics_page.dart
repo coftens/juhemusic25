@@ -385,7 +385,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
         node: ARKitNode(
           name: node.id,
           position: pos,
-          eulerAngles: vec.Vector3(_anchorPitch, _anchorYaw, 0),
+          eulerAngles: vec.Vector3(0, _anchorYaw, 0),
         ),
         materials: needsAlphaUpdate ? [_buildMaterial(alpha)] : null,
       );
