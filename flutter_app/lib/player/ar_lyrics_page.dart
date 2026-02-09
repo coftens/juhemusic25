@@ -62,7 +62,8 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   static const _farFadeStart = 6.0;
   static const _farFadeEnd = 14.0;
   static const _passZTrigger = 0.08;
-  static const _floatAmp = 0.03;
+  static const _floatAmp = 0.0;
+  static const _centerYOffset = 0.0;
   bool _cameraReady = false;
 
   // ─────────────────── 生命周期 ───────────────────────────
@@ -203,9 +204,9 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       -math.cos(_camYaw) * cosPitch,
     );
 
-    final floatY = math.sin(_lastFrameTime * 0.8 + index) * _floatAmp;
     final base = vec.Vector3(_camX, _camY, _camZ) + forward * zLocal;
-    return vec.Vector3(base.x, base.y + floatY, base.z);
+    final floatY = math.sin(_lastFrameTime * 0.8 + index) * _floatAmp;
+    return vec.Vector3(base.x, base.y + _centerYOffset + floatY, base.z);
   }
 
   int _currentSongMs() {
