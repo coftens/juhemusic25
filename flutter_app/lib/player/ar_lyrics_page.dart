@@ -28,11 +28,12 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
   final _svc = PlayerService.instance;
 
   ARKitController? _arkit;
-  vec.Matrix4? _lastCameraTransform;
 
-  static const _fadeStep = Duration(milliseconds: 70);
-  static const _fadeInSteps = [0.2, 0.45, 0.7, 0.95];
-  static const _fadeOutSteps = [0.6, 0.35, 0.15, 0.0];
+  static const _fadeStep = Duration(milliseconds: 80);
+  // 更多的淡入步数，让过渡更平滑
+  static const _fadeInSteps = [0.15, 0.32, 0.48, 0.62, 0.75, 0.85, 0.93, 1.0];
+  // 更多的淡出步数，让消失更自然
+  static const _fadeOutSteps = [0.9, 0.75, 0.58, 0.42, 0.28, 0.15, 0.06, 0.0];
 
   StreamSubscription<Duration>? _posSub;
   Timer? _passTimer;
@@ -133,6 +134,12 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     final idx = _findActiveIndex(_lines, ms);
     if (idx == _activeIndex) return;
 
+    // 立即移除不匹配的旧节点，避免切换时重叠
+    if (_currentNode != null && _currentNode!.index != idx) {
+      _arkit?.remove(_currentNode!.id);
+      _currentNode = null;
+    }
+
     _activeIndex = idx;
     _currentClearedByPass = false;
     _refreshNodes();
@@ -140,13 +147,6 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   void _onARKitViewCreated(ARKitController controller) {
     _arkit = controller;
-    
-    // Initialize camera transform
-    _lastCameraTransform = vec.Matrix4.identity();
-    
-    // Listen to AR frame updates for camera tracking
-    controller.onNodeTap = (_) {}; // Enable scene updates
-    
     _refreshNodes();
   }
 
@@ -157,15 +157,24 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       return;
     }
 
-    _fadeOutAllNodes();
+    // 移除不匹配的节点（而不是全部移除）
+    if (_currentNode != null && _currentNode!.index != _activeIndex) {
+      _arkit?.remove(_currentNode!.id);
+      _currentNode = null;
+    }
+    if (_nextNode != null && _nextNode!.index != _activeIndex + 1) {
+      _arkit?.remove(_nextNode!.id);
+      _nextNode = null;
+    }
 
     if (_activeIndex < 0 || _activeIndex >= _lines.length) return;
 
-    if (!_currentClearedByPass) {
+    // 只创建缺失的节点
+    if (!_currentClearedByPass && _currentNode == null) {
       _currentNode = _addLineNode(index: _activeIndex, distance: 5.0);
     }
 
-    if (_activeIndex + 1 < _lines.length) {
+    if (_nextNode == null && _activeIndex + 1 < _lines.length) {
       _nextNode = _addLineNode(index: _activeIndex + 1, distance: 10.0);
     }
   }
@@ -176,7 +185,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     final text = _lines[index].text;
     if (text.trim().isEmpty) return null;
 
-    final position = _positionInFrontOfCamera(distance);
+    final position = _positionInFrontOfCamera(distance, index);
     final nodeName = 'lyric_${index}_${distance.toStringAsFixed(1)}';
     _addTextNodeAt(nodeName, index, position, _fadeInSteps.first);
     _fadeInNode(nodeName, index, position);
@@ -198,7 +207,7 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     final material = _buildMaterial(opacity);
     final geometry = ARKitText(
       text: text,
-      extrusionDepth: 0.02,
+      extrusionDepth: 0.08, // 增加到0.08，字体更厚重、发光面更大
       materials: [material],
     );
 
@@ -206,7 +215,8 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       name: nodeName,
       geometry: geometry,
       position: position,
-      scale: vec.Vector3.all(0.01),
+      scale: vec.Vector3.all(0.048), // 进一步增大到0.048，接近参考视频的字体大小
+      constraints: [ARKitBillboardConstraint()],
     );
 
     _arkit?.add(node);
@@ -214,10 +224,25 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   ARKitMaterial _buildMaterial(double opacity) {
     final clamped = opacity.clamp(0.0, 1.0);
-    final glow = math.min(1.0, clamped + 0.35);
+    // 发光强度：透明到完全发光的渐进
+    final glowIntensity = math.min(1.2, clamped + 0.75);
+    
+    // 漫反射：白色为主，透明度随opacity变化
+    final diffuseColor = Colors.white.withOpacity(clamped);
+    
+    // 发光颜色：混合白色和青蓝色，在高opacity时更偏青蓝
+    final emissionBaseColor = Color.lerp(
+      const Color(0xFF88FFFF), // 浅青
+      const Color(0xFFFFFFFF), // 白色
+      (1.0 - clamped).clamp(0.0, 1.0),
+    ) ?? const Color(0xFFFFFFFF);
+    
     return ARKitMaterial(
-      diffuse: ARKitMaterialProperty.color(Colors.white.withOpacity(clamped)),
-      emission: ARKitMaterialProperty.color(Colors.white.withOpacity(glow)),
+      diffuse: ARKitMaterialProperty.color(diffuseColor),
+      // 强化发光效果：颜色 + 强度都增加
+      emission: ARKitMaterialProperty.color(
+        emissionBaseColor.withOpacity(glowIntensity),
+      ),
       lightingModelName: ARKitLightingModel.constant,
     );
   }
@@ -238,19 +263,31 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
 
   Future<void> _fadeOutNode(_ArLyricNode node) async {
     for (final opacity in _fadeOutSteps) {
-      if (!mounted || _arkit == null) return;
-      _arkit?.remove(node.id);
-      if (opacity > 0) {
-        _addTextNodeAt(node.id, node.index, node.position, opacity);
+      if (!mounted || _arkit == null) break;
+      try {
+        _arkit?.remove(node.id);
+        if (opacity > 0) {
+          _addTextNodeAt(node.id, node.index, node.position, opacity);
+        }
+      } catch (_) {
+        // 节点可能已被移除，忽略异常
       }
       await Future.delayed(_fadeStep);
     }
   }
 
-  vec.Vector3 _positionInFrontOfCamera(double distance) {
-    final camera = _lastCameraTransform;
+  double _getHeightForIndex(int index) {
+    // 使用索引生成伪随机高度，保证同一句歌词位置一致
+    final seed = (index * 12345) % 0x7FFFFFFF;
+    final random = math.Random(seed);
+    return -0.15 + random.nextDouble() * 0.25; // 范围: -0.15 ~ 0.1，"立在地面上"
+  }
+
+  vec.Vector3 _positionInFrontOfCamera(double distance, int index) {
+    final camera = _arkit?.cameraTransform;
+    final height = _getHeightForIndex(index);
     if (camera == null) {
-      return vec.Vector3(0, 0, -distance);
+      return vec.Vector3(0, height, -distance);
     }
 
     final camPos = camera.getTranslation();
@@ -260,11 +297,12 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
       -camera.entry(2, 2),
     );
     final dir = forward.length2 == 0 ? vec.Vector3(0, 0, -1) : forward.normalized();
-    return camPos + dir * distance;
+    final basePos = camPos + dir * distance;
+    return vec.Vector3(basePos.x, basePos.y + height, basePos.z);
   }
 
   vec.Vector3? _cameraPosition() {
-    final camera = _lastCameraTransform;
+    final camera = _arkit?.cameraTransform;
     if (camera == null) return null;
     return camera.getTranslation();
   }
@@ -284,7 +322,12 @@ class _ArLyricsPageState extends State<ArLyricsPage> {
     _currentNode = null;
     _currentClearedByPass = true;
     if (fading != null) {
-      _fadeOutNode(fading);
+      // 延时2秒后再销毁，保留穿过效果
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted && _arkit != null) {
+          _fadeOutNode(fading);
+        }
+      });
     }
   }
 
